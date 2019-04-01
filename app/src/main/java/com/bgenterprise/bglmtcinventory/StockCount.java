@@ -3,16 +3,12 @@ package com.bgenterprise.bglmtcinventory;
  * The activity that handles the entry of the stock count for each product.
  */
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,11 +18,12 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Scanner;
+
 
 public class StockCount extends AppCompatActivity {
 
@@ -118,7 +115,18 @@ public class StockCount extends AppCompatActivity {
 
             Toast.makeText(StockCount.this,"The Invoice Value for " + tvProductName.getText().toString() + " is: " + myFormat.format(invoiceValue), Toast.LENGTH_LONG).show();
 
+//            get the LMD and Product details from Session Manager
+            HashMap<String,String> val = session.getAllDetails();
+            String ItemId = val.get(SessionManager.KEY_PRODUCT_ID);
+            String LmdId = val.get(SessionManager.KEY_LMD_ID);
 
+//            update LMDInvoiceValue table with holding cost entry
+            InventoryDBHandler inventoryDBHandler = new InventoryDBHandler(this);
+            try {
+                inventoryDBHandler.updateInvoiceT(ItemId,LmdId);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             String UniqueID = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis());
             if(inventoryDBHandler.onAdd_Inventory03T(UniqueID, currentDate, allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), allDetails.get(SessionManager.KEY_PRODUCT_NAME), etCount.getText().toString(), "FOD", "0", "", "", "no")){

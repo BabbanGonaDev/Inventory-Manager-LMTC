@@ -17,4 +17,12 @@ public class InventoryDbContract {
         public static final String COLUMN_UNIT_PRICE = "UnitPrice";
 
     }
+
+    public static abstract class HoldingCostT implements BaseColumns{
+        public static final String TABLE_NAME = "HoldingCostT";
+        public static final String COLUMN_ID = "ID";
+        public static final String COLUMN_ITEM_ID = "ItemID";
+        public static final String COLUMN_HOLDING_COST = "HoldingCost";
+
+    }
 }

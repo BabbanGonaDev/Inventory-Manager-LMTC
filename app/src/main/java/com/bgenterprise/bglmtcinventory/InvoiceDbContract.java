@@ -18,6 +18,7 @@ public class InvoiceDbContract {
         public static final String COLUMN_LAST_FOD_COUNT = "LastFODCount";
         public static final String COLUMN_LAST_FOD_DATE = "LastFODdate";
         public static final String COLUMN_DELIVERY_SINCE_LAST_COUNT = "DeliverySinceLastCount";
+        public static final String COLUMN_HOLDING_COST = "HoldingCost";
 
     }
 
