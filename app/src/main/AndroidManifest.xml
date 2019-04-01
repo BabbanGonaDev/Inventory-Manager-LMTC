@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bgenterprise.bglmtcinventory">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Operations"
+            android:label="@string/title_activity_operations"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ScannerActivity" />
+        <activity
+            android:name=".ReceiptsPage"
+            android:label="Receipt Menu" />
+        <activity
+            android:name=".InvoicesPage"
+            android:label="Invoice Menu" />
+        <activity android:name=".NewReceipt" />
+        <activity android:name=".StockCount" />
+        <activity
+            android:name=".View_All_Invoices"
+            android:label="View All Invoices" />
+        <activity
+            android:name=".View_All_Receipts"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".View_LMD_Receipts"
+            android:label="View LMD Receipts" />
+        <activity android:name=".TellerPage" />
+        <activity
+            android:name=".View_All_Tellers"
+            android:label="View Tellers" />
+        <activity android:name=".NewTeller" />
+        <activity android:name=".AddTellerReceipt" />
+        <activity
+            android:name=".View_LMD_Invoices"
+            android:label="View LMD Invoices" />
+        <activity android:name=".View_Receivable" />
+        <activity android:name=".View_Teller_Receipts" />
+        <activity
+            android:name=".ReportsPage"
+            android:label="LMD Reports."
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".View_Reports" />
+        <activity
+            android:name=".DataActivity"
+            android:label="@string/title_activity_data"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
+
+</manifest>
