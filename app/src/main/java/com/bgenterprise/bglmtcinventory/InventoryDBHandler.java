@@ -4,8 +4,6 @@ package com.bgenterprise.bglmtcinventory;
  * Database handler class for the Inventory Database.
  */
 
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,20 +13,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-import java.sql.SQLInput;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import com.bgenterprise.bglmtcinventory.InventoryDbContract.HoldingCostT;
-import com.bgenterprise.bglmtcinventory.InventoryDbContract.Inventory03T;
-import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LMDInvoiceValueT;
 
 public class InventoryDBHandler extends SQLiteAssetHelper {
 
@@ -43,6 +33,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         this.context = context;
 
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int i, int i2){
@@ -215,177 +206,6 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         }
     }
 
-    public void updateInvoiceT(String ItemId, String LmdId) throws ParseException {
-
-        Map<String, String> map;
-        ArrayList<Map<String, String>> wordList = new ArrayList<>();
-        String dateAfterZero= null;
-        String lastZeroDate = null;
-        String hc = "0.00";
-        double holdingCost;
-        String lastDateWithHC = null;
-        Cursor cursor = null;
-        SQLiteDatabase database = getWritableDatabase();
-
-//        getting the holding cost
-        try {
-            cursor = database.rawQuery("SELECT " + HoldingCostT.COLUMN_HOLDING_COST + " FROM " + HoldingCostT.TABLE_NAME +
-                    " WHERE " + HoldingCostT.COLUMN_ITEM_ID + " =\"" + ItemId + "\"", null);
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()){
-                hc = cursor.getString(0);
-                cursor.moveToNext();
-            }
-
-            Log.d("hc",""+hc);
-        } catch (Exception e) {
-            Log.d("HERE", "" + e);
-        }
-
-        holdingCost = Double.valueOf(hc);
-        Log.d("HC ", "" + holdingCost);
-
-//        getting the last occurrence of zero balance
-        try {
-            cursor = database.rawQuery("SELECT " + Inventory03T.COLUMN_TXN_DATE + " FROM " + Inventory03T.TABLE_NAME + " WHERE " +
-                    Inventory03T.COLUMN_UNIT + " = 0 AND " + Inventory03T.COLUMN_LMD_ID + "='" + LmdId + "'"
-                    + " AND " + Inventory03T.COLUMN_ITEM_ID + "='" + ItemId + "' AND "+ Inventory03T.COLUMN_TYPE +" = 'FOD'"+ " ORDER BY " +
-                    Inventory03T.COLUMN_TXN_DATE + " DESC LIMIT 1", null);
-            cursor.moveToFirst();
-            while(!cursor.isAfterLast()){
-                lastZeroDate = cursor.getString(0);
-                cursor.moveToNext();
-            }
-        } catch (Exception e) {
-            Log.d("HERE", "" + e);
-        }
-
-        Log.d("lastZdate",""+lastZeroDate);
-
-//        getting the next date after the lastZeroDate
-        try {
-            cursor = database.rawQuery("SELECT " + Inventory03T.COLUMN_TXN_DATE + " FROM " + Inventory03T.TABLE_NAME + " WHERE " +
-                    Inventory03T.COLUMN_TXN_DATE + ">" + "'" + lastZeroDate + "'" + " AND " + Inventory03T.COLUMN_LMD_ID + "='" + LmdId + "'"
-                    + " AND " + Inventory03T.COLUMN_ITEM_ID + "='" + ItemId + "' AND "+Inventory03T.COLUMN_TYPE+" = 'FOD'" +
-                    " ORDER BY " + Inventory03T.COLUMN_TXN_DATE + " ASC LIMIT 1", null);
-            cursor.moveToFirst();
-            while(!cursor.isAfterLast()){
-                dateAfterZero = cursor.getString(0);
-                cursor.moveToNext();
-            }
-        } catch (Exception e) {
-            Log.d("HERE", "" + e);
-        }
-
-        Log.d("DateAfterZero",""+dateAfterZero);
-
-//        Converting the dateAFterZero to dd/mm/yyyy format
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format_ = new SimpleDateFormat("dd/MM/yyyy");
-        Date dateAfterZero_ = format_.parse(dateAfterZero);
-        Log.d("date1",""+dateAfterZero_);
-
-//        getting all instances of dates after dateAfterZero
-        cursor = database.rawQuery("SELECT " + Inventory03T.COLUMN_TXN_DATE + ", " + Inventory03T.COLUMN_UNIT + " FROM " +
-                Inventory03T.TABLE_NAME + " WHERE " + Inventory03T.COLUMN_TXN_DATE + ">" + "'" + dateAfterZero + "'" + " AND " +
-                Inventory03T.COLUMN_LMD_ID + "='" + LmdId + "'" + " AND " + Inventory03T.COLUMN_ITEM_ID + "='"
-                + ItemId + "' AND "+Inventory03T.COLUMN_TYPE +" = 'FOD'" + " ORDER BY " + Inventory03T.COLUMN_TXN_DATE, null);
-
-//        looping through the table to calculate invoice values
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
-            map = new HashMap<>();
-            map.put("date", cursor.getString(0));
-            map.put("balance", cursor.getString(1));
-
-            Log.d("date,bal",""+map.get("date")+" "+map.get("balance"));
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-            Date date = format.parse(map.get("date"));
-
-//                checking for difference in date between stocking date and current date and whether it is <= 14
-            long diffInMillies = Math.abs(date.getTime() - dateAfterZero_.getTime());
-            Log.d("today",""+date);
-            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            Log.d("diff",""+diff);
-
-
-            if (diff <= 14) {
-
-            } else {
-                Date today = new Date();
-                SimpleDateFormat formatter_ = new SimpleDateFormat("dd/MM/yyyy");
-                String today_string = formatter_.format(today);
-//                    getting the count of entries with holding cost in the InvoiceValueT satisfying the WHERE conditions
-                Cursor cursor1;
-                cursor1 = database.rawQuery("SELECT * FROM " + LMDInvoiceValueT.TABLE_NAME +
-                        " WHERE " + LMDInvoiceValueT.COLUMN_HOLDING_COST + "= 'Yes' AND " + LMDInvoiceValueT.COLUMN_LMD_ID + "='" +
-                        LmdId + "'" + " AND " + LMDInvoiceValueT.COLUMN_ITEM_ID + "='" + ItemId + "' AND " +
-                        LMDInvoiceValueT.COLUMN_TXN_DATE + " BETWEEN '" + dateAfterZero + "' AND '"+today_string+"'", null);
-
-                Log.d("count",""+cursor1.getCount());
-
-                int count = cursor1.getCount();
-                cursor1.close();
-                if (count == 0) {
-//                        checking for difference in date between stocking date and current date
-                    Date date1 = format.parse(map.get("date"));
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                    String today_string_ = formatter.format(date1);
-                    long diffInMillies_ = Math.abs(date1.getTime() - dateAfterZero_.getTime());
-                    long diff_ = TimeUnit.DAYS.convert(diffInMillies_, TimeUnit.MILLISECONDS);
-                    long total_diff = diff_ - 14;
-                    Log.d("total_diff", ""+total_diff);
-                    double invoiceVal = Integer.valueOf(Objects.requireNonNull(map.get("balance"))) * total_diff * holdingCost;
-
-//                        inserting invoice value details into InvoiceValueT
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(LMDInvoiceValueT.COLUMN_LMD_ID, LmdId);
-                    contentValues.put(LMDInvoiceValueT.COLUMN_ITEM_ID, ItemId);
-                    contentValues.put(LMDInvoiceValueT.COLUMN_TXN_DATE, String.valueOf(today_string));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_VALUE, String.valueOf(invoiceVal));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, "Yes");
-
-                    database.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
-
-                } else {
-                    Date today__ = new Date();
-                    SimpleDateFormat formatter__ = new SimpleDateFormat("dd/MM/yyyy");
-                    String today_string__ = formatter__.format(today__);
-                    Cursor cursor2;
-                    cursor2 = database.rawQuery("SELECT " + LMDInvoiceValueT.COLUMN_TXN_DATE + " FROM " + LMDInvoiceValueT.TABLE_NAME
-                            + " WHERE " + LMDInvoiceValueT.COLUMN_TXN_DATE + " < '30/03/19' AND " + LMDInvoiceValueT.COLUMN_HOLDING_COST +
-                            "= 'Yes' AND " + LMDInvoiceValueT.COLUMN_LMD_ID + "='" + LmdId + "'" + " AND " + LMDInvoiceValueT.COLUMN_ITEM_ID +
-                            "='" + ItemId + "' ORDER BY " + LMDInvoiceValueT.COLUMN_TXN_DATE + " DESC LIMIT 1", null);
-                    cursor2.moveToFirst();
-                    while(!cursor2.isAfterLast()){
-                        lastDateWithHC = cursor2.getString(0);
-                        cursor2.moveToNext();
-                    }
-                    Log.d("lastDatewithHC",""+lastDateWithHC);
-                    cursor2.close();
-                    @SuppressLint("SimpleDateFormat") SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
-                    Date lastDateWithHC_ = format2.parse(lastDateWithHC);
-                    Date today_ = new Date();
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                    String today_str = formatter.format(today_);
-                    long diffInMillies2 = Math.abs(today_.getTime() - lastDateWithHC_.getTime());
-                    long diff2 = TimeUnit.DAYS.convert(diffInMillies2, TimeUnit.MILLISECONDS);
-                    Log.d("diff2", ""+diff2);
-                    double invoiceVal2 = Integer.valueOf(Objects.requireNonNull(map.get("balance"))) * diff2 * holdingCost;
-
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(LMDInvoiceValueT.COLUMN_LMD_ID, LmdId);
-                    contentValues.put(LMDInvoiceValueT.COLUMN_ITEM_ID, ItemId);
-                    contentValues.put(LMDInvoiceValueT.COLUMN_TXN_DATE, String.valueOf(today_str));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_VALUE, String.valueOf(invoiceVal2));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, "Yes");
-
-                    database.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
-                }
-            }
-            cursor.moveToNext();
-        }
-
-    }
 
 
 }

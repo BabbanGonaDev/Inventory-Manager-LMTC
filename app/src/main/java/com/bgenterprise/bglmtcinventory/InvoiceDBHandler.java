@@ -117,7 +117,6 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return formerPrice.get(1);
     }
 
-
     //Get the latest price change date for an Item.
     public String getLatestDate(String PG, String Itemid){
         String date;

@@ -2,10 +2,8 @@ package com.bgenterprise.bglmtcinventory;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,7 +21,6 @@ import java.util.HashMap;
 public class SyncModule {
 
     static String InternetLink = "http://f5e8e9e5.ngrok.io/qrcode";
-
 
         public static class SyncDownInventory03T extends AsyncTask<String, String, String>{
             //This function syncs down the Inventory03T for the respective LMD.
@@ -108,7 +105,6 @@ public class SyncModule {
             }
         }
 
-
         public static class SyncUpInventory03T extends AsyncTask<String, String, String>{
 
             @SuppressLint("StaticFieldLeak")
@@ -164,7 +160,6 @@ public class SyncModule {
                 return db.getInventory03TRecords();
             }
         }
-
 
         public static class RefreshInventory03T extends AsyncTask<String, String, String>{
             @SuppressLint("StaticFieldLeak")
@@ -225,6 +220,5 @@ public class SyncModule {
                 return null;
             }
         }
-
 
     }
