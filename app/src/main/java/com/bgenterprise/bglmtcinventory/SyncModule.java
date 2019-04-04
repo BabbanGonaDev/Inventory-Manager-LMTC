@@ -15,12 +15,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class SyncModule {
 
-    static String InternetLink = "http://f5e8e9e5.ngrok.io/qrcode";
+    static String InternetLink = "http://e46aa207.ngrok.io";
+
 
         public static class SyncDownInventory03T extends AsyncTask<String, String, String>{
             //This function syncs down the Inventory03T for the respective LMD.
@@ -220,5 +234,80 @@ public class SyncModule {
                 return null;
             }
         }
+
+    public static class SyncDownPriceGroupT extends AsyncTask<String, String, String> {
+        @SuppressLint("StaticFieldLeak")
+        Context context;
+        InvoiceDBHandler invoiceDBHandler;
+
+        public SyncDownPriceGroupT(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            invoiceDBHandler = new InvoiceDBHandler(context);
+            String staff_id = strings[0];
+            HttpURLConnection httpURLConnection = null;
+
+            Gson gson = new GsonBuilder().create();
+            String staffID = gson.toJson(staff_id);
+            Log.d("staffID", "" + staffID);
+            try {
+                URL url = new URL(InternetLink + "/invoices/priceGroupT_syncDown");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staffID, "UTF-8");
+                Log.d("data_string", "" + data_string);
+                bufferedWriter.write(data_string);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                httpURLConnection.connect();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+                if (response_code == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+
+                    }
+                    Log.d("HERE", result + "");
+                    try {
+                        JSONArray arr = new JSONArray(result + "");
+                        Log.d("result", arr + "");
+                        invoiceDBHandler.updatePriceGroupT(arr);
+                        return "done";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "Operation failed, kindly check your internet connection";
+                    }
+
+                } else {
+                    return ("Sync failed due to internal error.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+        }
+    }
 
     }

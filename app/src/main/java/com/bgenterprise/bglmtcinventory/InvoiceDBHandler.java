@@ -1,11 +1,17 @@
 package com.bgenterprise.bglmtcinventory;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceGroupT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -333,5 +339,36 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return invoiceDetails;
     }
 
+    void updatePriceGroupT(JSONArray jsonArray) {
+        SQLiteDatabase db = getWritableDatabase();
+        JSONObject jsonObject;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                int check = 0;
+                Cursor cursor = db.rawQuery("SELECT COUNT(" + PriceGroupT.COLUMN_LMD_ID + ") from " + PriceGroupT.TABLE_NAME +
+                        " WHERE " + PriceGroupT.COLUMN_PG_NAME + " =\"" + jsonObject.get("PGName") + "\"", null);
+                cursor.moveToFirst();
+                if (!cursor.isAfterLast()) {
+                    check = cursor.getInt(0);
+                }
+                cursor.close();
+                ContentValues contentValues = new ContentValues();
+                if (check == 0) {
+                    contentValues.put(PriceGroupT.COLUMN_LMD_ID, jsonObject.getString("LMDID"));
+                    contentValues.put(PriceGroupT.COLUMN_PG_NAME, jsonObject.getString("PGName"));
 
+                    db.insert(PriceGroupT.TABLE_NAME, null, contentValues);
+                } else {
+                    contentValues.put(PriceGroupT.COLUMN_LMD_ID, jsonObject.getString("LMDID"));
+                    contentValues.put(PriceGroupT.COLUMN_PG_NAME, jsonObject.getString("PGName"));
+                    String where = PriceGroupT.COLUMN_LMD_ID + "=?";
+                    String[] whereArgs = new String[]{String.valueOf(jsonObject.getString("LMDID"))};
+                    db.update(PriceGroupT.TABLE_NAME, contentValues, where, whereArgs);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

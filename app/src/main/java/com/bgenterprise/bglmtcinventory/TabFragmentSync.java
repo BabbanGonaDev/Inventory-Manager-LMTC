@@ -2,17 +2,21 @@ package com.bgenterprise.bglmtcinventory;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 
 /**
@@ -21,7 +25,7 @@ import java.util.HashMap;
 public class TabFragmentSync extends Fragment {
     View view;
     SessionManager session;
-    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T;
+    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT;
 
     public TabFragmentSync() {
         // Required empty public constructor
@@ -36,6 +40,7 @@ public class TabFragmentSync extends Fragment {
         btnSyncDownInventory03T = view.findViewById(R.id.btnSyncDownInventory03T);
         btnSyncUpInventory03T = view.findViewById(R.id.btnSyncUpInventory03T);
         btnRefreshInventory03T = view.findViewById(R.id.btnRefreshInventory03T);
+        btnSyncDownPgroupT = view.findViewById(R.id.btnSyncDownPgroupT);
 
 
         btnSyncDownInventory03T.setOnClickListener(new View.OnClickListener() {
@@ -56,6 +61,26 @@ public class TabFragmentSync extends Fragment {
             @Override
             public void onClick(View v) {
                 RefreshInventory03T(v);
+            }
+        });
+
+        btnSyncDownPgroupT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> val = session.getAllDetails();
+                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
+                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownPriceGroupT sync = new SyncModule.SyncDownPriceGroupT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Log.d("s", "" + s);
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                sync.execute(staff_id);
             }
         });
 

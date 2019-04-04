@@ -91,8 +91,8 @@ public class StockCount extends AppCompatActivity {
     }
 
     public void ButtonScanProduct(View view){
-        QRPrefs.edit().putString("required", "Product_Count").commit();
-        QRPrefs.edit().putString("scanner_title", "Scan Product to Count").commit();
+//        QRPrefs.edit().putString("required", "Product_Count").commit();
+//        QRPrefs.edit().putString("scanner_title", "Scan Product to Count").commit();
         startActivity(new Intent(StockCount.this, ScannerActivity.class));
 
     }
