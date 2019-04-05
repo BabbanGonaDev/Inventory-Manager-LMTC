@@ -54,6 +54,16 @@
                 android:text="Sync down PriceGroupT"
                 android:textColor="@color/text_color_white" />
 
+            <Button
+                android:id="@+id/btnSyncDownPriceT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:background="@drawable/rounded_border"
+                android:text="Sync down PriceT"
+                android:textColor="@color/text_color_white" />
+
 
         </LinearLayout>
 

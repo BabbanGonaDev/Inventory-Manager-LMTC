@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceT;
+
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -25,7 +27,7 @@ import java.util.Objects;
 public class TabFragmentSync extends Fragment {
     View view;
     SessionManager session;
-    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT;
+    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT, btnSyncDownPriceT;
 
     public TabFragmentSync() {
         // Required empty public constructor
@@ -41,6 +43,7 @@ public class TabFragmentSync extends Fragment {
         btnSyncUpInventory03T = view.findViewById(R.id.btnSyncUpInventory03T);
         btnRefreshInventory03T = view.findViewById(R.id.btnRefreshInventory03T);
         btnSyncDownPgroupT = view.findViewById(R.id.btnSyncDownPgroupT);
+        btnSyncDownPriceT = view.findViewById(R.id.btnSyncDownPriceT);
 
 
         btnSyncDownInventory03T.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +73,26 @@ public class TabFragmentSync extends Fragment {
                 HashMap<String, String> val = session.getAllDetails();
                 String staff_id = val.get(SessionManager.KEY_STAFF_ID);
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncDownPriceGroupT sync = new SyncModule.SyncDownPriceGroupT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Log.d("s", "" + s);
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                sync.execute(staff_id);
+            }
+        });
+
+        btnSyncDownPriceT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> val = session.getAllDetails();
+                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
+                @SuppressLint("StaticFieldLeak") SyncDownPriceT sync = new SyncDownPriceT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
                     @Override
                     protected void onPostExecute(String s) {
                         Log.d("s", "" + s);

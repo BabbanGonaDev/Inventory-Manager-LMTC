@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceGroupT;
+import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 import org.json.JSONArray;
@@ -366,6 +367,63 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                     String[] whereArgs = new String[]{String.valueOf(jsonObject.getString("LMDID"))};
                     db.update(PriceGroupT.TABLE_NAME, contentValues, where, whereArgs);
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void updatePriceT(JSONArray jsonArray) {
+        SQLiteDatabase db = getWritableDatabase();
+        JSONObject jsonObject;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                int check = 0;
+                Cursor cursor = db.rawQuery("SELECT COUNT(" + PriceT.COLUMN_ITEM_ID + ") FROM " + PriceT.TABLE_NAME + " WHERE " +
+                        PriceT.COLUMN_PRICE_GROUP + " =\"" + jsonObject.get("PriceGroup") + "\" AND " + PriceT.COLUMN_ITEM_ID +
+                        " = \"" + jsonObject.get("ItemID") + "\"", null);
+                cursor.moveToFirst();
+                if (!cursor.isAfterLast()) {
+                    check = cursor.getInt(0);
+                }
+                cursor.close();
+                ContentValues contentValues = new ContentValues();
+                if (check == 0) {
+                    contentValues.put(PriceT.COLUMN_PRICE_GROUP, jsonObject.getString("PriceGroup"));
+                    contentValues.put(PriceT.COLUMN_ITEM, jsonObject.getString("Item"));
+                    contentValues.put(PriceT.COLUMN_ITEM_ID, jsonObject.getString("ItemID"));
+                    contentValues.put(PriceT.COLUMN_PRICE, jsonObject.getString("Price"));
+                    contentValues.put(PriceT.COLUMN_CHANGE_DATE, jsonObject.getString("ChngDate"));
+
+                    db.insert(PriceT.TABLE_NAME, null, contentValues);
+                } else {
+                    contentValues.put(PriceT.COLUMN_PRICE, jsonObject.getString("Price"));
+                    contentValues.put(PriceT.COLUMN_CHANGE_DATE, jsonObject.getString("ChngDate"));
+                    String where = PriceT.COLUMN_ITEM_ID + " =? AND " + PriceT.COLUMN_PRICE_GROUP + " =?";
+                    String[] whereArgs = new String[]{String.valueOf(jsonObject.getString("ItemID")),
+                            String.valueOf(jsonObject.getString("PriceGroup"))};
+
+                    db.update(PriceT.TABLE_NAME, contentValues, where, whereArgs);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    void RefreshLMDInvoiceValueT(JSONArray jsonArray) {
+        SQLiteDatabase db = getWritableDatabase();
+        JSONObject jsonObject;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            int check = 0;
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                Cursor cursor;
+//                cursor = db.rawQuery()
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
