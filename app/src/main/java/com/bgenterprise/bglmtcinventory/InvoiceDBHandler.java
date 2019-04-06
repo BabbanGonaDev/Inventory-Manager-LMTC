@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LMDInvoiceValueT;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceGroupT;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
@@ -418,15 +419,45 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         SQLiteDatabase db = getWritableDatabase();
         JSONObject jsonObject;
         for (int i = 0; i < jsonArray.length(); i++) {
-            int check = 0;
+
             try {
+                int check = 0;
                 jsonObject = jsonArray.getJSONObject(i);
                 Cursor cursor;
-//                cursor = db.rawQuery()
+                cursor = db.rawQuery("SELECT COUNT(" + LMDInvoiceValueT.COLUMN_ID + ") FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE " +
+                        LMDInvoiceValueT.COLUMN_LMD_ID + " = \"" + jsonObject.getString("LMDID") + "\" AND " + LMDInvoiceValueT.COLUMN_ITEM_ID +
+                        " = \"" + jsonObject.getString("ItemID") + "\" AND " + LMDInvoiceValueT.COLUMN_FOD_PHYSICAL_COUNT + " = \"" +
+                        jsonObject.getString("FODPhysicalCount") + "\" AND " + LMDInvoiceValueT.COLUMN_TXN_DATE + " = \"" + jsonObject.getString("TxnDate")
+                        + "\"", null);
+
+                cursor.moveToFirst();
+                if (!cursor.isAfterLast()) {
+                    check = cursor.getInt(0);
+                }
+                cursor.close();
+                ContentValues contentValues = new ContentValues();
+                if (check == 0) {
+                    contentValues.put(LMDInvoiceValueT.COLUMN_ITEM_ID, jsonObject.getString("ItemID"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_LMD_ID, jsonObject.getString("LMDID"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_FOD_PHYSICAL_COUNT, jsonObject.getString("FODPhysicalCount"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_TXN_DATE, jsonObject.getString("TxnDate"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_TYPE, jsonObject.getString("Type"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_UNIT_PRICE, jsonObject.getString("UnitPrice"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_QTY, jsonObject.getString("InvoiceQty"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_VALUE, jsonObject.getString("InvoiceValue"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_COUNT, jsonObject.getString("LastFODCount"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_DATE, jsonObject.getString("LastFODdate"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_DELIVERY_SINCE_LAST_COUNT, jsonObject.getString("DeliverySinceLastCount"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, jsonObject.getString("HoldingCost"));
+
+                    db.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
+                }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
+
+
 }

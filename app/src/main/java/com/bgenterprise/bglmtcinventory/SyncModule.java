@@ -33,8 +33,7 @@ import java.util.Objects;
 
 public class SyncModule {
 
-    static String InternetLink = "http://3a12a5ce.ngrok.io";
-
+    static String InternetLink = "http://f9bef08e.ngrok.io";
 
     public static class SyncDownInventory03T extends AsyncTask<String, String, String> {
         //This function syncs down the Inventory03T for the respective LMD.
@@ -79,7 +78,7 @@ public class SyncModule {
 
                 params.put("SyncDown03TJSON", MyJSONParams);
                 Log.d("CHECK", "Parameters posted online: " + MyJSONParams);
-                client.post(InternetLink + "/lmtc_fetch_inventory03t.php", params, new AsyncHttpResponseHandler() {
+                client.post(InternetLink + "/inventory/lmtc_fetch_inventory03t.php", params, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(String response) {
                         try {
@@ -138,7 +137,7 @@ public class SyncModule {
             params.put("SyncUp03TJSON", getInventory03TJSONSqlite());
             Log.d("CHECK", "Params has gotten here");
 
-            client.post(InternetLink + "/lmtc_insert_inventory03t.php", params, new AsyncHttpResponseHandler() {
+            client.post(InternetLink + "/inventory/lmtc_insert_inventory03t.php", params, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(String response) {
                     try {
@@ -196,7 +195,7 @@ public class SyncModule {
 
                 params.put("Refresh03TJSON", "");
                 //Log.d("CHECK", "Parameters posted online: " + MyJSONParams);
-                client.post(InternetLink + "/lmtc_refresh_inventory03t.php", params, new AsyncHttpResponseHandler() {
+                client.post(InternetLink + "/inventory/lmtc_refresh_inventory03t.php", params, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(String response) {
                         try {
@@ -326,7 +325,7 @@ public class SyncModule {
             String staffID = gson.toJson(staff_id);
 
             try {
-                URL url = new URL(InternetLink + "/invoices/priceT_SyncDown");
+                URL url = new URL(InternetLink + "/inventory/priceT_SyncDown.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -366,6 +365,153 @@ public class SyncModule {
                         return "Operation failed, kindly check your internet connection";
                     }
 
+                } else {
+                    return ("Sync failed due to internal error.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+        }
+    }
+
+    public static class RefreshLMDInvoiceValueT extends AsyncTask<String, String, String> {
+        @SuppressLint("StaticFieldLeak")
+        Context ctx;
+        InvoiceDBHandler invoiceDBHandler;
+
+        public RefreshLMDInvoiceValueT(Context context) {
+            this.ctx = context;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            invoiceDBHandler = new InvoiceDBHandler(ctx);
+            String staff_id = strings[0];
+            HttpURLConnection httpURLConnection = null;
+            Gson gson = new GsonBuilder().create();
+            String staffID = gson.toJson(staff_id);
+
+            try {
+                URL url = new URL(InternetLink + "/inventory/RefreshLMDInvoiceValueT.php");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staffID, "UTF-8");
+                Log.d("data_string", "" + data_string);
+                bufferedWriter.write(data_string);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                httpURLConnection.connect();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+
+            try {
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+                if (response_code == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    Log.d("result", String.valueOf(result));
+                    try {
+                        JSONArray arr = new JSONArray(result + "");
+                        Log.d("result", arr + "");
+                        invoiceDBHandler.RefreshLMDInvoiceValueT(arr);
+                        return "done";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "Operation failed, kindly check your internet connection";
+                    }
+
+                } else {
+                    return ("Sync failed due to internal error.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+        }
+    }
+
+    public static class updateLMDT extends AsyncTask<String, String, String> {
+
+        @SuppressLint("StaticFieldLeak")
+        Context ctx;
+        LMD_DBHandler lmd_dbHandler;
+
+        public updateLMDT(Context context) {
+            this.ctx = context;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            lmd_dbHandler = new LMD_DBHandler(ctx);
+            String staff_id = strings[0];
+            HttpURLConnection httpURLConnection = null;
+            Gson gson = new GsonBuilder().create();
+            String staffID = gson.toJson(staff_id);
+
+            try {
+                URL url = new URL(InternetLink + "/inventory/updateLMDT.php");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staffID, "UTF-8");
+                Log.d("data_string", "" + data_string);
+                bufferedWriter.write(data_string);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                httpURLConnection.connect();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+                if (response_code == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    Log.d("result", String.valueOf(result));
+                    try {
+                        JSONArray arr = new JSONArray(result + "");
+                        Log.d("result", arr + "");
+                        lmd_dbHandler.updateLMDT(arr);
+                        return "done";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "Operation failed, kindly check your internet connection";
+                    }
                 } else {
                     return ("Sync failed due to internal error.");
                 }

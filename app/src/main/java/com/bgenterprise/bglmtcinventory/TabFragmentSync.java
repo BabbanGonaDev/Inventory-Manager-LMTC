@@ -20,6 +20,13 @@ import com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceT;
 import java.util.HashMap;
 import java.util.Objects;
 
+import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshInventory03T;
+import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshLMDInvoiceValueT;
+import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownInventory03T;
+import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceGroupT;
+import static com.bgenterprise.bglmtcinventory.SyncModule.SyncUpInventory03T;
+import static com.bgenterprise.bglmtcinventory.SyncModule.updateLMDT;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +34,8 @@ import java.util.Objects;
 public class TabFragmentSync extends Fragment {
     View view;
     SessionManager session;
-    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT, btnSyncDownPriceT;
+    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT, btnSyncDownPriceT,
+            btnRefreshLMDInvValueT, btnUpdateLMDT;
 
     public TabFragmentSync() {
         // Required empty public constructor
@@ -44,6 +52,8 @@ public class TabFragmentSync extends Fragment {
         btnRefreshInventory03T = view.findViewById(R.id.btnRefreshInventory03T);
         btnSyncDownPgroupT = view.findViewById(R.id.btnSyncDownPgroupT);
         btnSyncDownPriceT = view.findViewById(R.id.btnSyncDownPriceT);
+        btnRefreshLMDInvValueT = view.findViewById(R.id.btnRefreshLMDIVT);
+        btnUpdateLMDT = view.findViewById(R.id.btnUpdateLMDT);
 
 
         btnSyncDownInventory03T.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +82,7 @@ public class TabFragmentSync extends Fragment {
             public void onClick(View v) {
                 HashMap<String, String> val = session.getAllDetails();
                 String staff_id = val.get(SessionManager.KEY_STAFF_ID);
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownPriceGroupT sync = new SyncModule.SyncDownPriceGroupT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                @SuppressLint("StaticFieldLeak") SyncDownPriceGroupT sync = new SyncDownPriceGroupT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
                     @Override
                     protected void onPostExecute(String s) {
                         Log.d("s", "" + s);
@@ -107,28 +117,68 @@ public class TabFragmentSync extends Fragment {
             }
         });
 
+        btnRefreshLMDInvValueT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> val = session.getAllDetails();
+                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
+                @SuppressLint("StaticFieldLeak") RefreshLMDInvoiceValueT sync = new RefreshLMDInvoiceValueT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Log.d("s", "" + s);
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                sync.execute(staff_id);
+            }
+        });
+
+        btnUpdateLMDT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> val = session.getAllDetails();
+                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
+                @SuppressLint("StaticFieldLeak") updateLMDT sync = new SyncModule.updateLMDT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Log.d("s", "" + s);
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                sync.execute(staff_id);
+            }
+        });
+
         return view;
     }
 
     public void SyncDownLMLInventory03T(View view){
         CheckInternetPermission();
         HashMap<String,String> user = session.getAllDetails();
-        SyncModule.SyncDownInventory03T syncDown = new SyncModule.SyncDownInventory03T(getActivity());
+        SyncDownInventory03T syncDown = new SyncDownInventory03T(getActivity());
         syncDown.execute(user.get(SessionManager.KEY_STAFF_ID));
     }
 
     public void SyncUpLMTCInventory03T(View view){
         CheckInternetPermission();
-        SyncModule.SyncUpInventory03T syncUp = new SyncModule.SyncUpInventory03T(getActivity());
+        SyncUpInventory03T syncUp = new SyncUpInventory03T(getActivity());
         syncUp.execute();
     }
 
     public void RefreshInventory03T(View view){
         CheckInternetPermission();
-        SyncModule.SyncUpInventory03T syncUp = new SyncModule.SyncUpInventory03T(getActivity());
+        SyncUpInventory03T syncUp = new SyncUpInventory03T(getActivity());
         syncUp.execute();
 
-        SyncModule.RefreshInventory03T refresh = new SyncModule.RefreshInventory03T(getActivity());
+        RefreshInventory03T refresh = new RefreshInventory03T(getActivity());
         refresh.execute();
     }
 
