@@ -94,6 +94,17 @@
                 android:text="Sync Up LMDInvoiceValue-T"
                 android:textColor="@color/text_color_white" />
 
+            <Button
+                android:id="@+id/btnUploadReceiptT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:background="@drawable/rounded_border"
+                android:text="Sync Up Receipt-T"
+                android:textColor="@color/text_color_white" />
+
+
         </LinearLayout>
 
     </ScrollView>

@@ -35,7 +35,7 @@ public class TabFragmentSync extends Fragment {
     View view;
     SessionManager session;
     Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT, btnSyncDownPriceT,
-            btnRefreshLMDInvValueT, btnUpdateLMDT, btnUploadLmdInvValT;
+            btnRefreshLMDInvValueT, btnUpdateLMDT, btnUploadLmdInvValT, btnUploadReceiptT;
 
     public TabFragmentSync() {
         // Required empty public constructor
@@ -55,7 +55,7 @@ public class TabFragmentSync extends Fragment {
         btnRefreshLMDInvValueT = view.findViewById(R.id.btnRefreshLMDIVT);
         btnUpdateLMDT = view.findViewById(R.id.btnUpdateLMDT);
         btnUploadLmdInvValT = view.findViewById(R.id.btnUploadLmdInvValueT);
-
+        btnUploadReceiptT = view.findViewById(R.id.btnUploadReceiptT);
 
         btnSyncDownInventory03T.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +162,23 @@ public class TabFragmentSync extends Fragment {
             @Override
             public void onClick(View v) {
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncUpLMDInvValueT sync = new SyncModule.SyncUpLMDInvValueT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                sync.execute();
+            }
+        });
+
+        btnUploadReceiptT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpReceiptTable sync = new SyncModule.SyncUpReceiptTable(getActivity().getApplicationContext()) {
                     @Override
                     protected void onPostExecute(String s) {
                         if (s.trim().equalsIgnoreCase("done")) {

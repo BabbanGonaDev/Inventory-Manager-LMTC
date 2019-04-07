@@ -530,6 +530,7 @@ public class SyncModule {
     }
 
     public static class SyncUpLMDInvValueT extends AsyncTask<Void, Void, String> {
+        @SuppressLint("StaticFieldLeak")
         Context ctx;
         ArrayList wordList;
         InvoiceDBHandler invoiceDBHandler;
@@ -604,6 +605,102 @@ public class SyncModule {
                         Log.d("array", arr + "");
 //                        update SQLite DB sync status to the online DB status
                         invoiceDBHandler.updateLMDInvValueTSyncStatus(arr);
+                        return "done";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "All records have been Synced";
+                    }
+                } else {
+                    return ("Sync failed due to a network error.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+        }
+    }
+
+    public static class SyncUpReceiptTable extends AsyncTask<Void, Void, String> {
+        @SuppressLint("StaticFieldLeak")
+        Context ctx;
+        ArrayList wordList;
+        ReceiptDBHandler receiptDBHandler;
+
+        public SyncUpReceiptTable(Context context) {
+            this.ctx = context;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            receiptDBHandler = new ReceiptDBHandler(ctx);
+            wordList = receiptDBHandler.uploadReceiptT();
+            Log.d("HERE", wordList + " " + wordList.size());
+            if (wordList.size() < 1) return "All your records have been synced";
+            Gson gson = new GsonBuilder().create();
+            String word_list = gson.toJson(wordList);
+            HttpURLConnection httpURLConnection = null;
+
+            try {
+//                initialize URL
+                URL url = new URL(InternetLink + "/inventory/SyncUpReceiptTable");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+//                set request method as 'POST'
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+//                initialize output stream
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+//                initialize buffered writer to write to online DB
+                BufferedWriter bufferedWriter;
+                bufferedWriter = new BufferedWriter
+                        (new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string;
+//                encode upload information to UTF-8 standard character set format
+                data_string = URLEncoder.encode("wordList", "UTF-8") + "=" + URLEncoder.encode(word_list, "UTF-8");
+                bufferedWriter.write(data_string);
+//                flush the buffer
+                bufferedWriter.flush();
+//                close the buffer
+                bufferedWriter.close();
+//                close the output stream
+                outputStream.close();
+//                connect to the internet
+                httpURLConnection.connect();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+//                get URL connection reponse code
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+//                do this is code denotes a positive connection
+                if (response_code == HttpURLConnection.HTTP_OK) {
+//                    initialize input stream
+                    InputStream input = httpURLConnection.getInputStream();
+//                    initialize buffered reader
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+//                    use string builder to store response values
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    Log.d("result", "" + result);
+
+                    try {
+                        JSONArray arr = new JSONArray(String.valueOf(result));
+                        Log.d("array", arr + "");
+//                        update SQLite DB sync status to the online DB status
+                        receiptDBHandler.updateReceiptTableSyncStatus(arr);
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
