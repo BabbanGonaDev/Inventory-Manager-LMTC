@@ -12,6 +12,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ReceiptDBHandler extends SQLiteAssetHelper {
 
@@ -99,5 +100,9 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         db.close();
 
         return sum;
+    }
+
+    ArrayList<Map<String, String>> uploadReceiptT() {
+        return null;
     }
 }

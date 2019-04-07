@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Database handler class for the Invoice Database.
@@ -459,5 +460,56 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }
     }
 
+    ArrayList<Map<String, String>> uploadLMDInvValueT() {
+        Map<String, String> map;
+        ArrayList<Map<String, String>> wordList = new ArrayList<>();
+        Cursor cursor;
+        SQLiteDatabase db = getWritableDatabase();
+        cursor = db.rawQuery("SELECT " + LMDInvoiceValueT.COLUMN_ID + "," + LMDInvoiceValueT.COLUMN_LMD_ID + "," + LMDInvoiceValueT.COLUMN_ITEM_ID + "," +
+                LMDInvoiceValueT.COLUMN_FOD_PHYSICAL_COUNT + "," + LMDInvoiceValueT.COLUMN_TXN_DATE + "," + LMDInvoiceValueT.COLUMN_TYPE + "," +
+                LMDInvoiceValueT.COLUMN_UNIT_PRICE + "," + LMDInvoiceValueT.COLUMN_INVOICE_QTY + "," + LMDInvoiceValueT.COLUMN_INVOICE_VALUE + "," +
+                LMDInvoiceValueT.COLUMN_LAST_FOD_COUNT + "," + LMDInvoiceValueT.COLUMN_LAST_FOD_DATE + "," + LMDInvoiceValueT.COLUMN_DELIVERY_SINCE_LAST_COUNT
+                + "," + LMDInvoiceValueT.COLUMN_HOLDING_COST + " FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE " + LMDInvoiceValueT.COLUMN_SYNC_STATUS +
+                " = 'no'", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            map = new HashMap<>();
+            map.put("ID", cursor.getString(0));
+            map.put("LMDID", cursor.getString(1));
+            map.put("ItemID", cursor.getString(2));
+            map.put("FODPhysicalCount", cursor.getString(3));
+            map.put("TxnDate", cursor.getString(4));
+            map.put("Type", cursor.getString(5));
+            map.put("UnitPrice", cursor.getString(6));
+            map.put("InvoiceQty", cursor.getString(7));
+            map.put("InvoiceValue", cursor.getString(8));
+            map.put("LastFODCount", cursor.getString(9));
+            map.put("LastFODdate", cursor.getString(10));
+            map.put("DeliverySinceLastCount", cursor.getString(11));
+            map.put("HoldingCost", cursor.getString(12));
 
+            wordList.add(map);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return wordList;
+    }
+
+    void updateLMDInvValueTSyncStatus(JSONArray jsonArray) {
+        JSONObject jsonObject;
+        SQLiteDatabase db = getWritableDatabase();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                db.execSQL("UPDATE " + LMDInvoiceValueT.TABLE_NAME + " SET " + LMDInvoiceValueT.COLUMN_SYNC_STATUS + " = '" + jsonObject.getString("SyncStatus")
+                        + "', " + LMDInvoiceValueT.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + LMDInvoiceValueT.COLUMN_LMD_ID +
+                        " = \"" + jsonObject.getString("LMDID") + "\" AND " + LMDInvoiceValueT.COLUMN_ITEM_ID + "=\"" + jsonObject.getString("ItemID")
+                        + "\" AND " + LMDInvoiceValueT.COLUMN_TXN_DATE + "=\"" + jsonObject.getString("TxnDate") + "\" AND " + LMDInvoiceValueT.COLUMN_INVOICE_VALUE +
+                        "=\"" + jsonObject.getString("InvoiceValue") + "\"");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d("HERE", e + "");
+            }
+        }
+    }
 }

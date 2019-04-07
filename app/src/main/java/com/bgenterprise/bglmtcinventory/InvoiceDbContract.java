@@ -19,6 +19,8 @@ public class InvoiceDbContract {
         public static final String COLUMN_LAST_FOD_DATE = "LastFODdate";
         public static final String COLUMN_DELIVERY_SINCE_LAST_COUNT = "DeliverySinceLastCount";
         public static final String COLUMN_HOLDING_COST = "HoldingCost";
+        public static final String COLUMN_SYNC_DATE = "SyncDate";
+        public static final String COLUMN_SYNC_STATUS = "SyncStatus";
 
     }
 
@@ -37,6 +39,21 @@ public class InvoiceDbContract {
         public static final String COLUMN_PRICE = "Price";
         public static final String COLUMN_CHANGE_DATE = "ChngDate";
 
+    }
+
+    public static abstract class receipt_table implements BaseColumns {
+        public static final String TABLE_NAME = "receipt_table";
+        public static final String COLUMN_RECEIPT_ID = "receipt_id";
+        public static final String COLUMN_LMD_NAME = "lmd_name";
+        public static final String COLUMN_LMD_ID = "lmd_id";
+        public static final String COLUMN_LMD_HUB = "lmd_hub";
+        public static final String COLUMN_AMOUNT = "amount";
+        public static final String COLUMN_MONEY_COLLECTED_BY = "moneycollectedby";
+        public static final String COLUMN_STAFF_ID = "staff_id";
+        public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_SYNC_STATUS = "SyncStatus";
+        public static final String COLUMN_APP_VERSION = "appVersion";
+        public static final String COLUMN_SYNC_DATE = "SyncDate";
     }
 
 
