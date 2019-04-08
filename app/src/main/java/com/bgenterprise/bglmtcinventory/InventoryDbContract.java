@@ -15,6 +15,9 @@ public class InventoryDbContract {
         public static final String COLUMN_UNIT = "Unit";
         public static final String COLUMN_TYPE = "Type";
         public static final String COLUMN_UNIT_PRICE = "UnitPrice";
+        public static final String COLUMN_NOTES = "Notes";
+        public static final String COLUMN_SYNC_DATE = "SyncDate";
+        public static final String COLUMN_SYNC_STATUS = "SyncStatus";
 
     }
 
@@ -23,6 +26,7 @@ public class InventoryDbContract {
         public static final String COLUMN_ID = "ID";
         public static final String COLUMN_ITEM_ID = "ItemID";
         public static final String COLUMN_HOLDING_COST = "HoldingCost";
+        public static final String COLUMN_LAST_CHANGE_DATE = "LastDateChange";
 
     }
 }

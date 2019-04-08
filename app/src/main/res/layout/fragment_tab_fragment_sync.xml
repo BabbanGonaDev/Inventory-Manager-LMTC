@@ -34,15 +34,15 @@
                 android:text="Sync Up Inventory-03T"
                 android:textColor="@color/text_color_white" />
 
-            <Button
-                android:id="@+id/btnRefreshInventory03T"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="10dp"
-                android:background="@drawable/rounded_border"
-                android:text="Refresh Inventory-03T"
-                android:textColor="@color/text_color_white" />
+            <!--<Button-->
+            <!--android:id="@+id/btnRefreshInventory03T"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:background="@drawable/rounded_border"-->
+            <!--android:text="Refresh Inventory-03T"-->
+            <!--android:textColor="@color/text_color_white" />-->
 
             <Button
                 android:id="@+id/btnSyncDownPgroupT"
@@ -124,6 +124,15 @@
                 android:text="Sync Up Teller-T"
                 android:textColor="@color/text_color_white" />
 
+            <Button
+                android:id="@+id/btnUpdateHoldingCostT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:background="@drawable/rounded_border"
+                android:text="Sync down HoldingCost-T"
+                android:textColor="@color/text_color_white" />
 
         </LinearLayout>
 

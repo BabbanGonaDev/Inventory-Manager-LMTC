@@ -7,13 +7,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -35,13 +31,14 @@ import java.util.Objects;
 
 public class SyncModule {
 
-    static String InternetLink = "http://01a0e2fa.ngrok.io";
+    private static String InternetLink = "http://77b70d4f.ngrok.io";
 
     public static class SyncDownInventory03T extends AsyncTask<String, String, String> {
         //This function syncs down the Inventory03T for the respective LMD.
-
+        String response;
         @SuppressLint("StaticFieldLeak")
         private Context mCtx;
+        InventoryDBHandler inventoryDBHandler;
 
         public SyncDownInventory03T(Context context) {
             this.mCtx = context;
@@ -57,6 +54,7 @@ public class SyncModule {
             //This is the staffID of the FOD that we will use to link the LMDs and the FODs.
             String staffID = strings[0];
             String lastLMLSyncDate = GetLastDateOfSync();
+            inventoryDBHandler = new InventoryDBHandler(mCtx);
 
             if (!staffID.isEmpty()) {
                 //Create a ArrayList
@@ -65,6 +63,7 @@ public class SyncModule {
 
                 //Create a HashMap of the needed variables.
                 HashMap<String, String> map = new HashMap<>();
+                HttpURLConnection httpURLConnection = null;
                 map.put("staff_id", staffID);
                 map.put("last_date", lastLMLSyncDate);
                 wordList.add(map);
@@ -73,50 +72,68 @@ public class SyncModule {
                 Gson gson = new GsonBuilder().create();
                 String MyJSONParams = gson.toJson(wordList);
 
+                try {
+                    URL url = new URL(InternetLink + "/inventory/lmtc_fetch_inventory03t.php");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    OutputStream outputStream = httpURLConnection.getOutputStream();
+                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                    String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staffID, "UTF-8") + "&" +
+                            URLEncoder.encode("last_date", "UTF-8") + "=" + URLEncoder.encode(lastLMLSyncDate, "UTF-8");
+                    Log.d("data_string", "" + data_string);
+                    bufferedWriter.write(data_string);
+                    bufferedWriter.flush();
+                    bufferedWriter.close();
+                    httpURLConnection.connect();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                //Create AsyncHttpClient Object.
-                AsyncHttpClient client = new AsyncHttpClient();
-                RequestParams params = new RequestParams();
-
-                params.put("SyncDown03TJSON", MyJSONParams);
-                Log.d("CHECK", "Parameters posted online: " + MyJSONParams);
-                client.post(InternetLink + "/inventory/lmtc_fetch_inventory03t.php", params, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(String response) {
+                try {
+                    int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+                    if (response_code == HttpURLConnection.HTTP_OK) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                        StringBuilder result = new StringBuilder();
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            result.append(line);
+                        }
+                        Log.d("result", String.valueOf(result));
                         try {
-                            JSONArray arr = new JSONArray(response);
-                            for (int i = 0; i < arr.length(); i++) {
-                                JSONObject obj = (JSONObject) arr.get(i);
-                                InventoryDBHandler db = new InventoryDBHandler(mCtx);
-                                Log.d("CHECK", obj.getString("LMDID") + " " + obj.getString("ItemName") + " " + obj.getString("Unit"));
-                                db.onAdd_Inventory03T(obj.getString("UniqueID"), obj.getString("TxnDate"), obj.getString("LMDID"), obj.getString("ItemID"),
-                                        obj.getString("ItemName"), obj.getString("Unit"), obj.getString("Type"), obj.getString("UnitPrice"),
-                                        obj.getString("Notes"), obj.getString("SyncDate"), "no");
-                            }
-                            //TODO ---> Toast Success Message.
+                            JSONArray arr = new JSONArray(result + "");
+                            Log.d("result", arr + "");
+                            inventoryDBHandler.updateInventory03T(arr);
+                            return "done";
                         } catch (JSONException e) {
-                            //TODO---> Toast JSON error message.
                             e.printStackTrace();
+                            return "Operation failed, kindly check your internet connection";
                         }
+                    } else {
+                        return ("Sync failed due to internal error.");
                     }
-
-                    @Override
-                    public void onFailure(int statusCode, Throwable error, String content) {
-                        if (statusCode == 404) {
-                            Log.d("CHECK", "Error Code: 404");
-                        } else if (statusCode == 500) {
-                            Log.d("CHECK", "Error Code: 500");
-                        } else {
-                            Log.d("CHECK", "Not Sure, Are you connected to Internet ?");
-                        }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "Sync failed due to internal error. Most likely a network error";
+                } finally {
+                    if (httpURLConnection != null) {
+                        httpURLConnection.disconnect();
                     }
-                });
+                }
 
             } else {
+                String synced = null;
                 //TODO ---> Toast staff ID empty.
                 Log.d("CHECK", "Staff ID is empty.");
+                synced = "Sync Failed due to Internal error";
+                response = synced;
             }
-            return null;
+            Log.d("response", "" + response);
+            return response;
         }
     }
 
@@ -125,6 +142,8 @@ public class SyncModule {
         @SuppressLint("StaticFieldLeak")
         private Context context;
         SessionManager session;
+        InventoryDBHandler inventoryDBHandler;
+        ArrayList wordList;
 
         public SyncUpInventory03T(Context context) {
             this.context = context;
@@ -132,109 +151,155 @@ public class SyncModule {
 
         @Override
         protected String doInBackground(String... strings) {
-            AsyncHttpClient client = new AsyncHttpClient();
-            RequestParams params = new RequestParams();
-            Log.d("CHECK", "Entered the doInBackground");
+            inventoryDBHandler = new InventoryDBHandler(context);
+            wordList = inventoryDBHandler.getInventory03TRecords();
+            Log.d("HERE", wordList + " " + wordList.size());
+            if (wordList.size() < 1) return "All your records have been synced";
+            Gson gson = new GsonBuilder().create();
+            String word_list = gson.toJson(wordList);
+            HttpURLConnection httpURLConnection = null;
 
-            params.put("SyncUp03TJSON", getInventory03TJSONSqlite());
-            Log.d("CHECK", "Params has gotten here");
+            try {
+//                initialize URL
+                URL url = new URL(InternetLink + "/inventory/lmtc_insert_inventory03t.php");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+//                set request method as 'POST'
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+//                initialize output stream
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+//                initialize buffered writer to write to online DB
+                BufferedWriter bufferedWriter;
+                bufferedWriter = new BufferedWriter
+                        (new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string;
+//                encode upload information to UTF-8 standard character set format
+                data_string = URLEncoder.encode("wordList", "UTF-8") + "=" + URLEncoder.encode(word_list, "UTF-8");
+                bufferedWriter.write(data_string);
+//                flush the buffer
+                bufferedWriter.flush();
+//                close the buffer
+                bufferedWriter.close();
+//                close the output stream
+                outputStream.close();
+//                connect to the internet
+                httpURLConnection.connect();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-            client.post(InternetLink + "/inventory/lmtc_insert_inventory03t.php", params, new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(String response) {
+            try {
+//                get URL connection reponse code
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+//                do this is code denotes a positive connection
+                if (response_code == HttpURLConnection.HTTP_OK) {
+//                    initialize input stream
+                    InputStream input = httpURLConnection.getInputStream();
+//                    initialize buffered reader
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+//                    use string builder to store response values
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    Log.d("result", "" + result);
+
                     try {
-                        JSONArray arr = new JSONArray(response);
-                        for (int i = 0; i < arr.length(); i++) {
-                            JSONObject obj = (JSONObject) arr.get(i);
-                            Log.d("CHECK", "Reply: " + obj.getString("UniqueID") + " " + obj.getString("SyncStatus"));
-                            //Update sync status.
-                            InventoryDBHandler db = new InventoryDBHandler(context);
-                            db.updateSyncStatus(obj.getString("UniqueID"), obj.getString("SyncStatus"));
-                        }
+                        JSONArray arr = new JSONArray(String.valueOf(result));
+                        Log.d("array", arr + "");
+//                        update SQLite DB sync status to the online DB status
+                        inventoryDBHandler.updateSyncStatus(arr);
+                        return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        return "All records have been Synced";
                     }
+                } else {
+                    return ("Sync failed due to a network error.");
                 }
-
-                @Override
-                public void onFailure(int statusCode, Throwable error, String content) {
-                    if (statusCode == 404) {
-
-                    } else if (statusCode == 500) {
-
-                    } else {
-
-                    }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
                 }
-            });
-            return null;
-        }
-
-        public String getInventory03TJSONSqlite() {
-            InventoryDBHandler db = new InventoryDBHandler(context);
-            return db.getInventory03TRecords();
-        }
-    }
-
-    public static class RefreshInventory03T extends AsyncTask<String, String, String> {
-        @SuppressLint("StaticFieldLeak")
-        private Context context;
-        InventoryDBHandler db;
-
-        public RefreshInventory03T(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            db = new InventoryDBHandler(context);
-            if (db.emptyInventory03T()) {
-                //Now download everything.
-
-                //Create AsyncHttpClient Object.
-                AsyncHttpClient client = new AsyncHttpClient();
-                RequestParams params = new RequestParams();
-
-                params.put("Refresh03TJSON", "");
-                //Log.d("CHECK", "Parameters posted online: " + MyJSONParams);
-                client.post(InternetLink + "/inventory/lmtc_refresh_inventory03t.php", params, new AsyncHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(String response) {
-                        try {
-                            JSONArray arr = new JSONArray(response);
-                            for (int i = 0; i < arr.length(); i++) {
-                                JSONObject obj = (JSONObject) arr.get(i);
-
-                                Log.d("CHECK", obj.getString("LMDID") + " " + obj.getString("ItemName") + " " + obj.getString("Unit"));
-                                db.onAdd_Inventory03T(obj.getString("UniqueID"), obj.getString("TxnDate"), obj.getString("LMDID"), obj.getString("ItemID"),
-                                        obj.getString("ItemName"), obj.getString("Unit"), obj.getString("Type"), obj.getString("UnitPrice"),
-                                        obj.getString("Notes"), obj.getString("SyncDate"), "no");
-                            }
-                            //TODO ---> Toast Success Message.
-                        } catch (JSONException e) {
-                            //TODO---> Toast JSON error message.
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Throwable error, String content) {
-                        if (statusCode == 404) {
-                            Log.d("CHECK", "Error Code: 404");
-                        } else if (statusCode == 500) {
-                            Log.d("CHECK", "Error Code: 500");
-                        } else {
-                            Log.d("CHECK", "Not Sure, Are you connected to Internet ?");
-                        }
-                    }
-                });
-
-            } else {
-                //Unable to empty the old database.
             }
-            return null;
+
         }
+
     }
+
+//    public static class RefreshInventory03T extends AsyncTask<String, String, String> {
+//        @SuppressLint("StaticFieldLeak")
+//        private Context context;
+//        InventoryDBHandler db;
+//
+//        public RefreshInventory03T(Context context) {
+//            this.context = context;
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... strings) {
+//            db = new InventoryDBHandler(context);
+//            if (db.emptyInventory03T()) {
+//                //Now download everything.
+//
+//                //Create AsyncHttpClient Object.
+//                AsyncHttpClient client = new AsyncHttpClient();
+//                RequestParams params = new RequestParams();
+//
+//                params.put("Refresh03TJSON", "");
+//                //Log.d("CHECK", "Parameters posted online: " + MyJSONParams);
+//                client.post(InternetLink + "/inventory/lmtc_refresh_inventory03t.php", params, new AsyncHttpResponseHandler() {
+//                    @Override
+//                    public void onSuccess(String response) {
+//                        try {
+//                            JSONArray arr = new JSONArray(response);
+//                            for (int i = 0; i < arr.length(); i++) {
+//                                JSONObject obj = (JSONObject) arr.get(i);
+//
+//                                Log.d("CHECK", obj.getString("LMDID") + " " + obj.getString("ItemName") + " " + obj.getString("Unit"));
+////                                db.onAdd_Inventory03T(obj.getString("UniqueID"), obj.getString("TxnDate"), obj.getString("LMDID"), obj.getString("ItemID"),
+////                                        obj.getString("ItemName"), obj.getString("Unit"), obj.getString("Type"), obj.getString("UnitPrice"),
+////                                        obj.getString("Notes"), obj.getString("SyncDate"), "no");
+//                            }
+//                            //TODO ---> Toast Success Message.
+//                            Toast.makeText(context, "Sync Successful", Toast.LENGTH_SHORT).show();
+//                        } catch (JSONException e) {
+//                            //TODO---> Toast JSON error message.
+//                            e.printStackTrace();
+//                            Toast.makeText(context, "Sync Failed due to Internal error", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int statusCode, Throwable error, String content) {
+//                        if (statusCode == 404) {
+//                            Log.d("CHECK", "Error Code: 404");
+//                            Toast.makeText(context, "Sync Failed, Please check your Internet Connection", Toast.LENGTH_SHORT).show();
+//                        } else if (statusCode == 500) {
+//                            Log.d("CHECK", "Error Code: 500");
+//                            Toast.makeText(context, "Sync Failed, Please check your Internet Connection", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Log.d("CHECK", "Not Sure, Are you connected to Internet ?");
+//                            Toast.makeText(context, "Sync Failed, Please check your Internet Connection", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+//
+//            } else {
+//                //Unable to empty the old database.
+//            }
+//            return null;
+//        }
+//    }
 
     public static class SyncDownPriceGroupT extends AsyncTask<String, String, String> {
         @SuppressLint("StaticFieldLeak")
@@ -364,6 +429,69 @@ public class SyncModule {
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        return "Sync failed due to internal error";
+                    }
+
+                } else {
+                    return ("Operation failed, kindly check your internet connection");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+        }
+    }
+
+    public static class SyncDownHoldingCostT extends AsyncTask<String, String, String> {
+        @SuppressLint("StaticFieldLeak")
+        Context ctx;
+        InventoryDBHandler inventoryDBHandler;
+
+        public SyncDownHoldingCostT(Context context) {
+            this.ctx = context;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            inventoryDBHandler = new InventoryDBHandler(ctx);
+            HttpURLConnection httpURLConnection = null;
+
+            try {
+                URL url = new URL(InternetLink + "/inventory/SyncDownHoldingCostT.php");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+                if (response_code == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    Log.d("result", String.valueOf(result));
+                    try {
+                        JSONArray arr = new JSONArray(result + "");
+                        Log.d("result", arr + "");
+                        inventoryDBHandler.updateHoldingCostT(arr);
+                        return "done";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                         return "Operation failed, kindly check your internet connection";
                     }
 
@@ -378,7 +506,6 @@ public class SyncModule {
                     httpURLConnection.disconnect();
                 }
             }
-
         }
     }
 

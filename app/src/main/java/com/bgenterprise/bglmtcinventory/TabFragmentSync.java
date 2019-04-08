@@ -20,12 +20,13 @@ import com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceT;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshInventory03T;
 import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshLMDInvoiceValueT;
 import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownInventory03T;
 import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceGroupT;
 import static com.bgenterprise.bglmtcinventory.SyncModule.SyncUpInventory03T;
 import static com.bgenterprise.bglmtcinventory.SyncModule.updateLMDT;
+
+//import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshInventory03T;
 
 
 /**
@@ -35,7 +36,8 @@ public class TabFragmentSync extends Fragment {
     View view;
     SessionManager session;
     Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT, btnSyncDownPriceT,
-            btnRefreshLMDInvValueT, btnUpdateLMDT, btnUploadLmdInvValT, btnUploadReceiptT, btnUploadRestockT, btnUploadTellerT;
+            btnRefreshLMDInvValueT, btnUpdateLMDT, btnUploadLmdInvValT, btnUploadReceiptT, btnUploadRestockT, btnUploadTellerT,
+            btnUpdateHoldCostT;
 
     public TabFragmentSync() {
         // Required empty public constructor
@@ -49,7 +51,7 @@ public class TabFragmentSync extends Fragment {
         session = new SessionManager(getActivity());
         btnSyncDownInventory03T = view.findViewById(R.id.btnSyncDownInventory03T);
         btnSyncUpInventory03T = view.findViewById(R.id.btnSyncUpInventory03T);
-        btnRefreshInventory03T = view.findViewById(R.id.btnRefreshInventory03T);
+//        btnRefreshInventory03T = view.findViewById(R.id.btnRefreshInventory03T);
         btnSyncDownPgroupT = view.findViewById(R.id.btnSyncDownPgroupT);
         btnSyncDownPriceT = view.findViewById(R.id.btnSyncDownPriceT);
         btnRefreshLMDInvValueT = view.findViewById(R.id.btnRefreshLMDIVT);
@@ -58,6 +60,7 @@ public class TabFragmentSync extends Fragment {
         btnUploadReceiptT = view.findViewById(R.id.btnUploadReceiptT);
         btnUploadRestockT = view.findViewById(R.id.btnUploadRestockT);
         btnUploadTellerT = view.findViewById(R.id.btnUploadTellerT);
+        btnUpdateHoldCostT = view.findViewById(R.id.btnUpdateHoldingCostT);
 
         btnSyncDownInventory03T.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,12 +76,12 @@ public class TabFragmentSync extends Fragment {
             }
         });
 
-        btnRefreshInventory03T.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RefreshInventory03T(v);
-            }
-        });
+//        btnRefreshInventory03T.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                RefreshInventory03T(v);
+//            }
+//        });
 
         btnSyncDownPgroupT.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -228,37 +231,72 @@ public class TabFragmentSync extends Fragment {
             }
         });
 
+        btnUpdateHoldCostT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownHoldingCostT sync = new SyncModule.SyncDownHoldingCostT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                sync.execute();
+            }
+        });
+
         return view;
     }
 
-    public void SyncDownLMLInventory03T(View view){
+    public void SyncDownLMLInventory03T(View view) {
         CheckInternetPermission();
-        HashMap<String,String> user = session.getAllDetails();
-        SyncDownInventory03T syncDown = new SyncDownInventory03T(getActivity());
+        HashMap<String, String> user = session.getAllDetails();
+        @SuppressLint("StaticFieldLeak") SyncDownInventory03T syncDown = new SyncDownInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+            @Override
+            protected void onPostExecute(String s) {
+                if (s.trim().equalsIgnoreCase("done")) {
+                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
         syncDown.execute(user.get(SessionManager.KEY_STAFF_ID));
     }
 
-    public void SyncUpLMTCInventory03T(View view){
+    public void SyncUpLMTCInventory03T(View view) {
         CheckInternetPermission();
-        SyncUpInventory03T syncUp = new SyncUpInventory03T(getActivity());
-        syncUp.execute();
-    }
-
-    public void RefreshInventory03T(View view){
-        CheckInternetPermission();
-        SyncUpInventory03T syncUp = new SyncUpInventory03T(getActivity());
-        syncUp.execute();
-
-        RefreshInventory03T refresh = new RefreshInventory03T(getActivity());
-        refresh.execute();
-    }
-
-    public void CheckInternetPermission(){
-        try {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.INTERNET}, 23);
+        @SuppressLint("StaticFieldLeak") SyncUpInventory03T syncUp = new SyncUpInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
+            @Override
+            protected void onPostExecute(String s) {
+                if (s.trim().equalsIgnoreCase("done")) {
+                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                }
             }
-        }catch (Exception e){
+        };
+        syncUp.execute();
+    }
+
+//    public void RefreshInventory03T(View view) {
+//        CheckInternetPermission();
+//        SyncUpInventory03T syncUp = new SyncUpInventory03T(getActivity());
+//        syncUp.execute();
+//
+//        RefreshInventory03T refresh = new RefreshInventory03T(getActivity());
+//        refresh.execute();
+//    }
+
+    public void CheckInternetPermission() {
+        try {
+            if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(Objects.requireNonNull(getActivity()), new String[]{Manifest.permission.INTERNET}, 23);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
