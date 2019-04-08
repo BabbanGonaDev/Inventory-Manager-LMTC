@@ -56,5 +56,32 @@ public class InvoiceDbContract {
         public static final String COLUMN_SYNC_DATE = "SyncDate";
     }
 
+    public static abstract class RestockT implements BaseColumns {
+        public static final String TABLE_NAME = "RestockT";
+        public static final String COLUMN_LMD_ID = "LMDID";
+        public static final String COLUMN_ITEM_ID = "ItemID";
+        public static final String COLUMN_RESTOCK_VALUE = "RestockValue";
+        public static final String COLUMN_LMD_KEY = "LMDKey";
+        public static final String COLUMN_COUNT = "Count";
+        public static final String COLUMN_REQUEST_DATE = "RequestDate";
+        public static final String COLUMN_SYNC_STATUS = "SyncStatus";
+        public static final String COLUMN_SYNC_DATE = "SyncDate";
+
+    }
+
+    public static abstract class teller_table implements BaseColumns {
+        public static final String TABLE_NAME = "teller_table";
+        public static final String COLUMN_TELLER_ID = "teller_id";
+        public static final String COLUMN_TELLER_AMOUNT = "teller_amount";
+        public static final String COLUMN_TELLER_BANK = "teller_bank";
+        public static final String COLUMN_RECEIPT_ID = "receipt_id";
+        public static final String COLUMN_RECEIPT_AMOUNT = "receipt_amount";
+        public static final String COLUMN_TELLER_DATE = "teller_date";
+        public static final String COLUMN_SYNC_STATUS = "SyncStatus";
+        public static final String COLUMN_APP_VERSION = "app_version";
+        public static final String COLUMN_SYNC_DATE = "SyncDate";
+
+    }
+
 
 }

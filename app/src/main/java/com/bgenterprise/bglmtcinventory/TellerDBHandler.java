@@ -7,12 +7,19 @@ package com.bgenterprise.bglmtcinventory;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.bgenterprise.bglmtcinventory.InvoiceDbContract.teller_table;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-import java.sql.SQLInput;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TellerDBHandler extends SQLiteAssetHelper {
 
@@ -135,6 +142,50 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         db.close();
 
         return Integer.valueOf(amount);
+    }
+
+    ArrayList<Map<String, String>> uploadTellerT() {
+        Map<String, String> map;
+        ArrayList<Map<String, String>> wordList = new ArrayList<>();
+        Cursor cursor;
+        SQLiteDatabase db = getWritableDatabase();
+
+        cursor = db.rawQuery("SELECT " + teller_table.COLUMN_TELLER_ID + "," + teller_table.COLUMN_TELLER_AMOUNT + "," + teller_table.COLUMN_TELLER_BANK
+                + "," + teller_table.COLUMN_RECEIPT_ID + "," + teller_table.COLUMN_RECEIPT_AMOUNT + "," + teller_table.COLUMN_TELLER_DATE + "," +
+                teller_table.COLUMN_APP_VERSION + " FROM " + teller_table.TABLE_NAME + " WHERE " + teller_table.COLUMN_SYNC_STATUS + " = 'no'", null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            map = new HashMap<>();
+            map.put("teller_id", cursor.getString(0));
+            map.put("teller_amount", cursor.getString(1));
+            map.put("teller_bank", cursor.getString(2));
+            map.put("receipt_id", cursor.getString(3));
+            map.put("receipt_amount", cursor.getString(4));
+            map.put("teller_date", cursor.getString(5));
+            map.put("app_version", cursor.getString(6));
+
+            wordList.add(map);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return wordList;
+    }
+
+    void updateTellerTSyncStatus(JSONArray jsonArray) {
+        JSONObject jsonObject;
+        SQLiteDatabase db = getWritableDatabase();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                db.execSQL("UPDATE " + teller_table.TABLE_NAME + " SET " + teller_table.COLUMN_SYNC_STATUS + " = '" + jsonObject.getString("SyncStatus")
+                        + "', " + teller_table.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + teller_table.COLUMN_TELLER_ID +
+                        " = \"" + jsonObject.getString("teller_id") + "\"");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d("HERE", e + "");
+            }
+        }
     }
 
 }

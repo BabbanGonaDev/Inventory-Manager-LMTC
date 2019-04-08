@@ -3,11 +3,19 @@ package com.bgenterprise.bglmtcinventory;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.bgenterprise.bglmtcinventory.InvoiceDbContract.RestockT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RestockDBHandler extends SQLiteAssetHelper {
 
@@ -59,6 +67,52 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         cursor.close();
         db.close();
         return restocks;
+    }
+
+    ArrayList<Map<String, String>> uploadRestockT() {
+        Map<String, String> map;
+        ArrayList<Map<String, String>> wordList = new ArrayList<>();
+        Cursor cursor;
+        SQLiteDatabase db = getWritableDatabase();
+
+        cursor = db.rawQuery("SELECT " + RestockT.COLUMN_LMD_ID + "," + RestockT.COLUMN_ITEM_ID + "," + RestockT.COLUMN_RESTOCK_VALUE + "," +
+                RestockT.COLUMN_LMD_KEY + "," + RestockT.COLUMN_COUNT + "," + RestockT.COLUMN_REQUEST_DATE + " FROM " + RestockT.TABLE_NAME +
+                " WHERE " + RestockT.COLUMN_SYNC_STATUS + "= 'no'", null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            map = new HashMap<>();
+            map.put("LMDID", cursor.getString(0));
+            map.put("ItemID", cursor.getString(1));
+            map.put("RestockValue", cursor.getString(2));
+            map.put("LMDKey", cursor.getString(3));
+            map.put("Count", cursor.getString(4));
+            map.put("RequestDate", cursor.getString(5));
+
+            wordList.add(map);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return wordList;
+    }
+
+    void updateRestockTSyncStatus(JSONArray jsonArray) {
+        JSONObject jsonObject;
+        SQLiteDatabase db = getWritableDatabase();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                db.execSQL("UPDATE " + RestockT.TABLE_NAME + " SET " + RestockT.COLUMN_SYNC_STATUS + " = '" + jsonObject.getString("SyncStatus")
+                        + "', " + RestockT.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + RestockT.COLUMN_LMD_ID +
+                        "= \"" + jsonObject.getString("LMDID") + "\" AND " + RestockT.COLUMN_LMD_KEY + "= \"" + jsonObject.getString("LMDKey") +
+                        "\" AND " + RestockT.COLUMN_ITEM_ID + "=\"" + jsonObject.getString("ItemID") + "\"");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d("HERE", e + "");
+            }
+
+        }
+
     }
 
 
