@@ -183,7 +183,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
                         " = \"" + jsonObject.getString("teller_id") + "\"");
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.d("HERE", e + "");
+                Log.d("TellerTSyncStatusEx", e + "");
             }
         }
     }

@@ -31,20 +31,19 @@ import java.util.Objects;
 
 public class SyncModule {
 
-    private static String InternetLink = "http://77b70d4f.ngrok.io";
+    private static String InternetLink = "http://02ec992c.ngrok.io";
 
     public static class SyncDownInventory03T extends AsyncTask<String, String, String> {
         //This function syncs down the Inventory03T for the respective LMD.
-        String response;
         @SuppressLint("StaticFieldLeak")
         private Context mCtx;
         InventoryDBHandler inventoryDBHandler;
 
-        public SyncDownInventory03T(Context context) {
+        SyncDownInventory03T(Context context) {
             this.mCtx = context;
         }
 
-        public String GetLastDateOfSync() {
+        String GetLastDateOfSync() {
             InventoryDBHandler db = new InventoryDBHandler(mCtx);
             return db.GetLastLMLSyncDate();
         }
@@ -56,84 +55,70 @@ public class SyncModule {
             String lastLMLSyncDate = GetLastDateOfSync();
             inventoryDBHandler = new InventoryDBHandler(mCtx);
 
-            if (!staffID.isEmpty()) {
-                //Create a ArrayList
-                ArrayList<HashMap<String, String>> wordList;
-                wordList = new ArrayList<HashMap<String, String>>();
+            //Create a ArrayList
+            ArrayList<HashMap<String, String>> wordList;
+            wordList = new ArrayList<>();
 
-                //Create a HashMap of the needed variables.
-                HashMap<String, String> map = new HashMap<>();
-                HttpURLConnection httpURLConnection = null;
-                map.put("staff_id", staffID);
-                map.put("last_date", lastLMLSyncDate);
-                wordList.add(map);
+            //Create a HashMap of the needed variables.
+            HashMap<String, String> map = new HashMap<>();
+            HttpURLConnection httpURLConnection = null;
+            map.put("staff_id", staffID);
+            map.put("last_date", lastLMLSyncDate);
+            wordList.add(map);
 
-                //Convert the wordList to JSON.
-                Gson gson = new GsonBuilder().create();
-                String MyJSONParams = gson.toJson(wordList);
-
-                try {
-                    URL url = new URL(InternetLink + "/inventory/lmtc_fetch_inventory03t.php");
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("POST");
-                    httpURLConnection.setDoInput(true);
-                    httpURLConnection.setDoOutput(true);
-                    OutputStream outputStream = httpURLConnection.getOutputStream();
-                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
-                    String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staffID, "UTF-8") + "&" +
-                            URLEncoder.encode("last_date", "UTF-8") + "=" + URLEncoder.encode(lastLMLSyncDate, "UTF-8");
-                    Log.d("data_string", "" + data_string);
-                    bufferedWriter.write(data_string);
-                    bufferedWriter.flush();
-                    bufferedWriter.close();
-                    httpURLConnection.connect();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
-                    if (response_code == HttpURLConnection.HTTP_OK) {
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                        StringBuilder result = new StringBuilder();
-                        String line;
-                        while ((line = bufferedReader.readLine()) != null) {
-                            result.append(line);
-                        }
-                        Log.d("result", String.valueOf(result));
-                        try {
-                            JSONArray arr = new JSONArray(result + "");
-                            Log.d("result", arr + "");
-                            inventoryDBHandler.updateInventory03T(arr);
-                            return "done";
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            return "Operation failed, kindly check your internet connection";
-                        }
-                    } else {
-                        return ("Sync failed due to internal error.");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return "Sync failed due to internal error. Most likely a network error";
-                } finally {
-                    if (httpURLConnection != null) {
-                        httpURLConnection.disconnect();
-                    }
-                }
-
-            } else {
-                String synced = null;
-                //TODO ---> Toast staff ID empty.
-                Log.d("CHECK", "Staff ID is empty.");
-                synced = "Sync Failed due to Internal error";
-                response = synced;
+            try {
+                URL url = new URL(InternetLink + "/inventory/lmtc_fetch_inventory03t.php");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staffID, "UTF-8") + "&" +
+                        URLEncoder.encode("last_date", "UTF-8") + "=" + URLEncoder.encode(lastLMLSyncDate, "UTF-8");
+                Log.d("data_string", "" + data_string);
+                bufferedWriter.write(data_string);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                httpURLConnection.connect();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            Log.d("response", "" + response);
-            return response;
+
+            try {
+                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+                if (response_code == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    Log.d("result", String.valueOf(result));
+                    try {
+                        JSONArray arr = new JSONArray(result + "");
+                        Log.d("result", arr + "");
+                        inventoryDBHandler.updateInventory03T(arr);
+                        return "done";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "Operation failed, kindly check your internet connection";
+                    }
+                } else {
+                    return ("Sync failed due to internal error.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "Sync failed due to internal error. Most likely a network error";
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
         }
     }
 
@@ -145,7 +130,7 @@ public class SyncModule {
         InventoryDBHandler inventoryDBHandler;
         ArrayList wordList;
 
-        public SyncUpInventory03T(Context context) {
+        SyncUpInventory03T(Context context) {
             this.context = context;
         }
 
@@ -154,7 +139,7 @@ public class SyncModule {
             inventoryDBHandler = new InventoryDBHandler(context);
             wordList = inventoryDBHandler.getInventory03TRecords();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "All your records have been synced";
+            if (wordList.size() < 1) return "done";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
@@ -236,77 +221,13 @@ public class SyncModule {
 
     }
 
-//    public static class RefreshInventory03T extends AsyncTask<String, String, String> {
-//        @SuppressLint("StaticFieldLeak")
-//        private Context context;
-//        InventoryDBHandler db;
-//
-//        public RefreshInventory03T(Context context) {
-//            this.context = context;
-//        }
-//
-//        @Override
-//        protected String doInBackground(String... strings) {
-//            db = new InventoryDBHandler(context);
-//            if (db.emptyInventory03T()) {
-//                //Now download everything.
-//
-//                //Create AsyncHttpClient Object.
-//                AsyncHttpClient client = new AsyncHttpClient();
-//                RequestParams params = new RequestParams();
-//
-//                params.put("Refresh03TJSON", "");
-//                //Log.d("CHECK", "Parameters posted online: " + MyJSONParams);
-//                client.post(InternetLink + "/inventory/lmtc_refresh_inventory03t.php", params, new AsyncHttpResponseHandler() {
-//                    @Override
-//                    public void onSuccess(String response) {
-//                        try {
-//                            JSONArray arr = new JSONArray(response);
-//                            for (int i = 0; i < arr.length(); i++) {
-//                                JSONObject obj = (JSONObject) arr.get(i);
-//
-//                                Log.d("CHECK", obj.getString("LMDID") + " " + obj.getString("ItemName") + " " + obj.getString("Unit"));
-////                                db.onAdd_Inventory03T(obj.getString("UniqueID"), obj.getString("TxnDate"), obj.getString("LMDID"), obj.getString("ItemID"),
-////                                        obj.getString("ItemName"), obj.getString("Unit"), obj.getString("Type"), obj.getString("UnitPrice"),
-////                                        obj.getString("Notes"), obj.getString("SyncDate"), "no");
-//                            }
-//                            //TODO ---> Toast Success Message.
-//                            Toast.makeText(context, "Sync Successful", Toast.LENGTH_SHORT).show();
-//                        } catch (JSONException e) {
-//                            //TODO---> Toast JSON error message.
-//                            e.printStackTrace();
-//                            Toast.makeText(context, "Sync Failed due to Internal error", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(int statusCode, Throwable error, String content) {
-//                        if (statusCode == 404) {
-//                            Log.d("CHECK", "Error Code: 404");
-//                            Toast.makeText(context, "Sync Failed, Please check your Internet Connection", Toast.LENGTH_SHORT).show();
-//                        } else if (statusCode == 500) {
-//                            Log.d("CHECK", "Error Code: 500");
-//                            Toast.makeText(context, "Sync Failed, Please check your Internet Connection", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Log.d("CHECK", "Not Sure, Are you connected to Internet ?");
-//                            Toast.makeText(context, "Sync Failed, Please check your Internet Connection", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//
-//            } else {
-//                //Unable to empty the old database.
-//            }
-//            return null;
-//        }
-//    }
 
     public static class SyncDownPriceGroupT extends AsyncTask<String, String, String> {
         @SuppressLint("StaticFieldLeak")
         Context context;
         InvoiceDBHandler invoiceDBHandler;
 
-        public SyncDownPriceGroupT(Context context) {
+        SyncDownPriceGroupT(Context context) {
             this.context = context;
         }
 
@@ -319,7 +240,7 @@ public class SyncModule {
             String staffID = gson.toJson(staff_id);
             Log.d("staffID", "" + staffID);
             try {
-                URL url = new URL(InternetLink + "/invoices/priceGroupT_syncDown");
+                URL url = new URL(InternetLink + "/inventory/priceGroupT_syncDown");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -379,7 +300,7 @@ public class SyncModule {
         Context ctx;
         InvoiceDBHandler invoiceDBHandler;
 
-        public SyncDownPriceT(Context context) {
+        SyncDownPriceT(Context context) {
             this.ctx = context;
         }
 
@@ -452,7 +373,7 @@ public class SyncModule {
         Context ctx;
         InventoryDBHandler inventoryDBHandler;
 
-        public SyncDownHoldingCostT(Context context) {
+        SyncDownHoldingCostT(Context context) {
             this.ctx = context;
         }
 
@@ -514,7 +435,7 @@ public class SyncModule {
         Context ctx;
         InvoiceDBHandler invoiceDBHandler;
 
-        public RefreshLMDInvoiceValueT(Context context) {
+        RefreshLMDInvoiceValueT(Context context) {
             this.ctx = context;
         }
 
@@ -589,7 +510,7 @@ public class SyncModule {
         Context ctx;
         LMD_DBHandler lmd_dbHandler;
 
-        public updateLMDT(Context context) {
+        updateLMDT(Context context) {
             this.ctx = context;
         }
 
@@ -662,7 +583,7 @@ public class SyncModule {
         ArrayList wordList;
         InvoiceDBHandler invoiceDBHandler;
 
-        public SyncUpLMDInvValueT(Context context) {
+        SyncUpLMDInvValueT(Context context) {
             this.ctx = context;
         }
 
@@ -671,7 +592,7 @@ public class SyncModule {
             invoiceDBHandler = new InvoiceDBHandler(ctx);
             wordList = invoiceDBHandler.uploadLMDInvValueT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "All your records have been synced";
+            if (wordList.size() < 1) return "done";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
@@ -758,7 +679,7 @@ public class SyncModule {
         ArrayList wordList;
         ReceiptDBHandler receiptDBHandler;
 
-        public SyncUpReceiptTable(Context context) {
+        SyncUpReceiptTable(Context context) {
             this.ctx = context;
         }
 
@@ -767,7 +688,7 @@ public class SyncModule {
             receiptDBHandler = new ReceiptDBHandler(ctx);
             wordList = receiptDBHandler.uploadReceiptT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "All your records have been synced";
+            if (wordList.size() < 1) return "done";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
@@ -854,7 +775,7 @@ public class SyncModule {
         ArrayList wordList;
         RestockDBHandler restockDBHandler;
 
-        public SyncUpRestockT(Context context) {
+        SyncUpRestockT(Context context) {
             this.ctx = context;
         }
 
@@ -863,7 +784,7 @@ public class SyncModule {
             restockDBHandler = new RestockDBHandler(ctx);
             wordList = restockDBHandler.uploadRestockT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "All your records have been synced";
+            if (wordList.size() < 1) return "done";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
@@ -949,7 +870,7 @@ public class SyncModule {
         ArrayList wordList;
         TellerDBHandler tellerDBHandler;
 
-        public SyncUpTellerT(Context context) {
+        SyncUpTellerT(Context context) {
             this.ctx = context;
         }
 
@@ -958,7 +879,7 @@ public class SyncModule {
             tellerDBHandler = new TellerDBHandler(ctx);
             wordList = tellerDBHandler.uploadTellerT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "All your records have been synced";
+            if (wordList.size() < 1) return "done";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;

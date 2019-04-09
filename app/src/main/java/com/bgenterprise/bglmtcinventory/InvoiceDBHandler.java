@@ -35,7 +35,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 
     Context context;
 
-    public InvoiceDBHandler(Context context){
+    InvoiceDBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
     }
@@ -46,8 +46,8 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Insert into the Invoice Database.
-    public boolean onAdd_LMDInvoiceValueT(String LMDID, String ItemID, String FODPhysicalCount, String TxnDate, String Type, String UnitPrice,
-                         String InvoiceQty, String InvoiceValue, String LastFODCount, String LastFODDate, String DeliverySinceLastCount){
+    boolean onAdd_LMDInvoiceValueT(String LMDID, String ItemID, String FODPhysicalCount, String TxnDate, String Type, String UnitPrice,
+                                   String InvoiceQty, String InvoiceValue, String LastFODCount, String LastFODDate, String DeliverySinceLastCount) {
 
         try{
             SQLiteDatabase db = getWritableDatabase();
@@ -64,7 +64,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get the price group for an LMD from the PriceGroupT table.
-    public String getPriceGroup(String lmdID){
+    String getPriceGroup(String lmdID) {
         String group;
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT PGName FROM PriceGroupT WHERE LMDID = '" + lmdID + "'", null);
@@ -82,7 +82,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get the number of times, a price change has been recorded for a specific item in a price group.
-    public Integer getPriceChangeCount(String pgName, String itemID){
+    Integer getPriceChangeCount(String pgName, String itemID) {
         int count;
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM PriceT WHERE PriceGroup = '" + pgName + "' AND ItemID = '" + itemID + "'",null);
@@ -96,7 +96,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get the most recent price change for an Item in a priceGroup.
-    public Double getSinglePrice(String PG, String Itemid){
+    Double getSinglePrice(String PG, String Itemid) {
         Double ItemPrice;
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM PriceT WHERE PriceGroup = '" + PG + "' AND ItemID = '" + Itemid + "' ORDER BY ChngDate DESC LIMIT 1", null);
@@ -110,7 +110,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get the 2nd to the most recent price change in the Price table.
-    public Double getFormerPrice(String PG, String Itemid){
+    Double getFormerPrice(String PG, String Itemid) {
         List<Double> formerPrice = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM PriceT WHERE PriceGroup = '" + PG + "' AND ItemID = '" + Itemid + "' ORDER BY ChngDate DESC LIMIT 2", null);
@@ -127,7 +127,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get the latest price change date for an Item.
-    public String getLatestDate(String PG, String Itemid){
+    String getLatestDate(String PG, String Itemid) {
         String date;
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM PriceT WHERE PriceGroup = '" + PG + "' AND ItemID = '" + Itemid + "' ORDER BY ChngDate DESC LIMIT 1", null);
@@ -141,8 +141,8 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get the sum of total Invoices for an LMD and Item.
-    public Integer getTotalInvoices(String LMDid, String item_id){
-        int totalInvoices = 0;
+    Integer getTotalInvoices(String LMDid, String item_id) {
+        int totalInvoices;
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.rawQuery("SELECT SUM(InvoiceValue) FROM LMDInvoiceValueT WHERE LMDID = '" + LMDid + "' AND ItemID = '" + item_id + "'", null);
@@ -156,7 +156,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get total LMD's Invoices.
-    public Double getLMDsInvoices(String lmdid){
+    Double getLMDsInvoices(String lmdid) {
         double amount = 0.0;
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.rawQuery("SELECT SUM(InvoiceValue) FROM LMDInvoiceValueT WHERE LMDID = '" + lmdid + "'", null);
@@ -175,7 +175,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get a list of all the Invoices.
-    public List<Invoices> getAllInvoices(){
+    List<Invoices> getAllInvoices() {
         List<Invoices> invoices = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT *, COUNT(LMDID), SUM(InvoiceValue) FROM LMDInvoiceValueT GROUP BY TxnDate, LMDID ORDER BY TxnDate DESC", null);
@@ -191,7 +191,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get a list of all the Invoices based on LMD.
-    public List<Invoices> getAllInvoices(String lmdid){
+    List<Invoices> getAllInvoices(String lmdid) {
         List<Invoices> invoices = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT LMDID, TxnDate, COUNT(LMDID), SUM(InvoiceValue) FROM LMDInvoiceValueT WHERE LMDID = '"+ lmdid +"' GROUP BY TxnDate, LMDID ORDER BY TxnDate DESC", null);
@@ -207,7 +207,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     }
 
     //Get a list of the specific invoices attributed to an LMD on a specific date.
-    public List<Invoices> getSpecificLMDInvoices(String lmd_id, String txn_date){
+    List<Invoices> getSpecificLMDInvoices(String lmd_id, String txn_date) {
         List<Invoices> list = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM LMDInvoiceValueT WHERE LMDID = '" + lmd_id + "' AND TxnDate = '" + txn_date + "'", null);
@@ -224,7 +224,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 
 
     //Gets the 2nd to the most recent invoice entry for the LMD and Item for the restock calc..
-    public String getFormerInvDate(String LMDID, String ItemID){
+    String getFormerInvDate(String LMDID, String ItemID) {
 
         List<String> formerDate = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
@@ -252,7 +252,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 
     }
 
-    public Double getInvoiceSum(String lmd_id){
+    Double getInvoiceSum(String lmd_id) {
         double sum = 0.00;
 
         SQLiteDatabase db = getWritableDatabase();
@@ -274,7 +274,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return sum;
     }
 
-    public Double latestInvoice(String lmd_id){
+    Double latestInvoice(String lmd_id) {
         double latest = 0.00;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = new Date();
@@ -299,7 +299,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return latest;
     }
 
-    public HashMap<String,String> LastCountDetails(String lmdID, String item){
+    HashMap<String, String> LastCountDetails(String lmdID, String item) {
 
         HashMap<String, String> lastCount = null;
         SQLiteDatabase db = getWritableDatabase();
@@ -319,7 +319,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return lastCount;
     }
 
-    public HashMap<String, String> getInvoiceDetails(String LMDID, String TxnDate, String ItemID){
+    HashMap<String, String> getInvoiceDetails(String LMDID, String TxnDate, String ItemID) {
         HashMap<String, String> invoiceDetails = null;
         SQLiteDatabase db = getWritableDatabase();
 
@@ -450,6 +450,8 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                     contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_DATE, jsonObject.getString("LastFODdate"));
                     contentValues.put(LMDInvoiceValueT.COLUMN_DELIVERY_SINCE_LAST_COUNT, jsonObject.getString("DeliverySinceLastCount"));
                     contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, jsonObject.getString("HoldingCost"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_DATE, jsonObject.getString("SyncDate"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_STATUS, jsonObject.getString("SyncStatus"));
 
                     db.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
                 }

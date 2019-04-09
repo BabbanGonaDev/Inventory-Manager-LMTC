@@ -1,7 +1,7 @@
 package com.bgenterprise.bglmtcinventory;
 
-/**
- * Database handler class for the Inventory Database.
+/*
+  Database handler class for the Inventory Database.
  */
 
 import android.content.ContentValues;
@@ -33,7 +33,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
 
     Context context;
 
-    public InventoryDBHandler(Context context) {
+    InventoryDBHandler(Context context) {
         //DBHandler constructor.
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -46,7 +46,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
-    public boolean onAdd_Inventory03T(String UniqueID, String TxnDate, String LMDID, String ItemID, String ItemName, String Unit, String Type, String UnitPrice, String Notes, String SyncDate, String SyncStatus) {
+    boolean onAdd_Inventory03T(String UniqueID, String TxnDate, String LMDID, String ItemID, String ItemName, String Unit, String Type, String UnitPrice, String Notes, String SyncDate, String SyncStatus) {
         try {
             //Inserts records into the Inventory03T table.
             SQLiteDatabase db = getWritableDatabase();
@@ -104,9 +104,9 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
     }
 
 
-    public Integer getNumberOf_FODEntries(String LMDid, String Itemid, String transDate) {
+    Integer getNumberOf_FODEntries(String LMDid, String Itemid, String transDate) {
         //Gets the number of times that FOD count entries have been made in the database for a specific LMD.
-        int FODEntry_count = 0;
+        int FODEntry_count;
 
         //Get today's date.
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -125,9 +125,9 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         return FODEntry_count;
     }
 
-    public Integer getLMLTotalDeliveries(String LMDid, String item_id) {
+    Integer getLMLTotalDeliveries(String LMDid, String item_id) {
         //Gets the number of LML Delivery entries have been made in the database for the LMD.
-        int totalDeliveries = 0;
+        int totalDeliveries;
 
         SQLiteDatabase database = getWritableDatabase();
         Cursor c = database.rawQuery("SELECT SUM(Unit) FROM Inventory03T WHERE LMDID = '" + LMDid + "' AND ItemID = '" + item_id + "' AND Type = 'LML'", null);
@@ -140,7 +140,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         return totalDeliveries;
     }
 
-    public Integer DeliveriesSinceLastCount(String lmdID, String item, String lastDate) {
+    Integer DeliveriesSinceLastCount(String lmdID, String item, String lastDate) {
 
         int lastDeliveries = 0;
 
@@ -168,7 +168,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         return lastDeliveries;
     }
 
-    public String GetLastLMLSyncDate() {
+    String GetLastLMLSyncDate() {
         String lastDate = "";
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM Inventory03T WHERE Type = 'LML' ORDER BY SyncDate DESC LIMIT 1", null);
@@ -255,7 +255,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 jsonObject = jsonArray.getJSONObject(i);
-                int check = 0;
+                int check;
                 Cursor cursor = db.rawQuery("SELECT COUNT(" + HoldingCostT.COLUMN_ID + ") FROM " + HoldingCostT.TABLE_NAME + " WHERE " +
                         HoldingCostT.COLUMN_ITEM_ID + " = \"" + jsonObject.getString("ItemID") + "\"", null);
 
