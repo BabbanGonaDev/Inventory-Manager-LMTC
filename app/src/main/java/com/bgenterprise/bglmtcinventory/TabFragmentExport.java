@@ -41,22 +41,28 @@ public class TabFragmentExport extends Fragment {
                 final int[] count = {0};
 
                 sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "inventory.db", directory_path + "/Exports");
-                sqliteToExcel.exportAllTables("inventoryDB.xls", new SQLiteToExcel.ExportListener() {
-                    @Override
-                    public void onStart() {
-                    }
+                try {
+                    sqliteToExcel.exportAllTables("inventoryDB.xls", new SQLiteToExcel.ExportListener() {
+                        @Override
+                        public void onStart() {
+                        }
 
-                    @Override
-                    public void onCompleted(String filePath) {
-                        count[0]++;
-                        Log.d("count", "" + count[0]);
-                    }
+                        @Override
+                        public void onCompleted(String filePath) {
+                            count[0]++;
+                            Log.d("count", "" + count[0]);
+                        }
 
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("e", "" + e);
-                    }
-                });
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("e", "" + e);
+                        }
+                    }, getActivity().getApplicationContext());
+                } catch (Exception e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Export failed. Sync down all databases on first installation",
+                            Toast.LENGTH_SHORT).show();
+                }
+
 
                 sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "invoices.db", directory_path + "/Exports");
                 sqliteToExcel.exportAllTables("invoicesDB.xls", new SQLiteToExcel.ExportListener() {
@@ -74,80 +80,104 @@ public class TabFragmentExport extends Fragment {
                     public void onError(Exception e) {
                         Log.d("e", "" + e);
                     }
-                });
+                }, getActivity().getApplicationContext());
 
                 sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "lmd.db", directory_path + "/Exports");
-                sqliteToExcel.exportAllTables("LmdDB.xls", new SQLiteToExcel.ExportListener() {
-                    @Override
-                    public void onStart() {
-                    }
+                try {
+                    sqliteToExcel.exportAllTables("LmdDB.xls", new SQLiteToExcel.ExportListener() {
+                        @Override
+                        public void onStart() {
+                        }
 
-                    @Override
-                    public void onCompleted(String filePath) {
-                        count[0]++;
-                        Log.d("count", "" + count[0]);
-                    }
+                        @Override
+                        public void onCompleted(String filePath) {
+                            count[0]++;
+                            Log.d("count", "" + count[0]);
+                        }
 
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("e", "" + e);
-                    }
-                });
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("e", "" + e);
+                        }
+                    }, getActivity().getApplicationContext());
+                } catch (Exception e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Export failed. Sync down all databases on first installation",
+                            Toast.LENGTH_SHORT).show();
+                }
+
 
                 sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "receipts.db", directory_path + "/Exports");
-                sqliteToExcel.exportAllTables("receiptsDB.xls", new SQLiteToExcel.ExportListener() {
-                    @Override
-                    public void onStart() {
-                    }
+                try {
+                    sqliteToExcel.exportAllTables("receiptsDB.xls", new SQLiteToExcel.ExportListener() {
+                        @Override
+                        public void onStart() {
+                        }
 
-                    @Override
-                    public void onCompleted(String filePath) {
-                        count[0]++;
-                        Log.d("count", "" + count[0]);
-                    }
+                        @Override
+                        public void onCompleted(String filePath) {
+                            count[0]++;
+                            Log.d("count", "" + count[0]);
+                        }
 
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("e", "" + e);
-                    }
-                });
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("e", "" + e);
+                        }
+                    }, getActivity().getApplicationContext());
+                } catch (Exception e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Export failed. Sync down all databases on first installation",
+                            Toast.LENGTH_SHORT).show();
+                }
+
 
                 sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "restocks.db", directory_path + "/Exports");
-                sqliteToExcel.exportAllTables("restocksDB.xls", new SQLiteToExcel.ExportListener() {
-                    @Override
-                    public void onStart() {
-                    }
+                try {
+                    sqliteToExcel.exportAllTables("restocksDB.xls", new SQLiteToExcel.ExportListener() {
+                        @Override
+                        public void onStart() {
+                        }
 
-                    @Override
-                    public void onCompleted(String filePath) {
-                        count[0]++;
-                        Log.d("count", "" + count[0]);
-                    }
+                        @Override
+                        public void onCompleted(String filePath) {
+                            count[0]++;
+                            Log.d("count", "" + count[0]);
+                        }
 
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("e", "" + e);
-                    }
-                });
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("e", "" + e);
+                        }
+                    }, getActivity().getApplicationContext());
+                } catch (Exception e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Export failed. Sync down all databases on first installation",
+                            Toast.LENGTH_SHORT).show();
+                }
+
 
                 sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "tellers.db", directory_path + "/Exports");
-                sqliteToExcel.exportAllTables("tellersDB.xls", new SQLiteToExcel.ExportListener() {
-                    @Override
-                    public void onStart() {
-                    }
+                try {
+                    sqliteToExcel.exportAllTables("tellersDB.xls", new SQLiteToExcel.ExportListener() {
+                        @Override
+                        public void onStart() {
+                        }
 
-                    @Override
-                    public void onCompleted(String filePath) {
-                        count[0]++;
-                        Log.d("count", "final" + count[0]);
-                        Toast.makeText(getActivity().getApplicationContext(), "Exported Successfully", Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void onCompleted(String filePath) {
+                            count[0]++;
+                            Log.d("count", "final" + count[0]);
+                            Toast.makeText(getActivity().getApplicationContext(), "Exported Successfully", Toast.LENGTH_SHORT).show();
+                        }
 
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("e", "" + e);
-                    }
-                });
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("e", "" + e);
+                        }
+                    }, getActivity().getApplicationContext());
+                } catch (Exception e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Export failed. Sync down all databases on first installation",
+                            Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });

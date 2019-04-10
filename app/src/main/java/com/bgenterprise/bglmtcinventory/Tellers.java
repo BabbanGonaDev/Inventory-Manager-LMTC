@@ -16,7 +16,7 @@ public class Tellers {
     private String teller_date;
 
     //For the Tellers.
-    public Tellers(String teller_id, String teller_amount, String teller_bank, String receipt_count, String teller_date) {
+    Tellers(String teller_id, String teller_amount, String teller_bank, String receipt_count, String teller_date) {
         this.teller_id = teller_id;
         this.teller_amount = teller_amount;
         this.teller_bank = teller_bank;
@@ -26,28 +26,28 @@ public class Tellers {
 
 
     //For details of the tellers.
-    public Tellers(String receipt_id, String receipt_amount) {
+    Tellers(String receipt_id, String receipt_amount) {
         this.receipt_id = receipt_id;
         this.receipt_amount = receipt_amount;
     }
 
-    public String getTeller_id() {
+    String getTeller_id() {
         return teller_id;
     }
 
-    public String getTeller_amount() {
+    String getTeller_amount() {
         return teller_amount;
     }
 
-    public String getTeller_bank() {
+    String getTeller_bank() {
         return teller_bank;
     }
 
-    public String getReceipt_id() {
+    String getReceipt_id() {
         return receipt_id;
     }
 
-    public String getReceipt_amount() {
+    String getReceipt_amount() {
         return receipt_amount;
     }
 
@@ -55,11 +55,11 @@ public class Tellers {
         return receipt_date;
     }
 
-    public String getReceipt_count() {
+    String getReceipt_count() {
         return receipt_count;
     }
 
-    public String getTeller_date() {
+    String getTeller_date() {
         return teller_date;
     }
 }

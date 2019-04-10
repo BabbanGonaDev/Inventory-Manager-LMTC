@@ -3,6 +3,7 @@ package com.bgenterprise.bglmtcinventory;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -73,6 +74,9 @@ public class TabFragmentSync extends Fragment {
                 final int[] countDown = {0};
                 HashMap<String, String> val = session.getAllDetails();
                 String staff_id = val.get(SessionManager.KEY_STAFF_ID);
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setMessage("Syncing down records, please wait");
+                progressDialog.show();
                 @SuppressLint("StaticFieldLeak") SyncDownPriceGroupT sync6 = new SyncDownPriceGroupT(getActivity().getApplicationContext()) {
                     @Override
                     protected void onPostExecute(@NonNull String s) {
@@ -155,10 +159,13 @@ public class TabFragmentSync extends Fragment {
 //                        }
                         Log.d("Countdown", "" + countDown[0]);
                         if (countDown[0] == 6) {
-                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync failed, " +
-                                    "please check your internet connection", Toast.LENGTH_SHORT).show();
+                                    "please check your internet connection", Toast.LENGTH_LONG).show();
                         }
                     }
                 };
@@ -172,6 +179,9 @@ public class TabFragmentSync extends Fragment {
         btnUploadData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setMessage("Syncing up records, please wait");
+                progressDialog.show();
                 final int[] countUp = {0};
                 CheckInternetPermission();
                 @SuppressLint("StaticFieldLeak") SyncUpInventory03T syncUp = new SyncUpInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
@@ -248,10 +258,13 @@ public class TabFragmentSync extends Fragment {
 
                         Log.d("CountUp", "" + countUp[0]);
                         if (countUp[0] == 5) {
-                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync failed, " +
-                                    "please check your internet connection", Toast.LENGTH_SHORT).show();
+                                    "please check your internet connection", Toast.LENGTH_LONG).show();
                         }
                     }
                 };
@@ -260,237 +273,10 @@ public class TabFragmentSync extends Fragment {
 
             }
         });
-//        btnSyncDownInventory03T.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SyncDownLMLInventory03T(v);
-//            }
-//        });
-//
-//        btnSyncUpInventory03T.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SyncUpLMTCInventory03T(v);
-//            }
-//        });
 
-//        btnRefreshInventory03T.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                RefreshInventory03T(v);
-//            }
-//        });
-
-//        btnSyncDownPgroupT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                HashMap<String, String> val = session.getAllDetails();
-//                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
-//                @SuppressLint("StaticFieldLeak") SyncDownPriceGroupT sync = new SyncDownPriceGroupT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        Log.d("s", "" + s);
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            count += 1;
-//                        }
-////                        else {
-////                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-////                        }
-//                    }
-//                };
-//                sync.execute(staff_id);
-//            }
-//        });
-//
-//        btnSyncDownPriceT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                HashMap<String, String> val = session.getAllDetails();
-//                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
-//                @SuppressLint("StaticFieldLeak") SyncDownPriceT sync = new SyncDownPriceT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        Log.d("s", "" + s);
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            count += 1;
-//                        }
-////                        else {
-////                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-////                        }
-//                    }
-//                };
-//                sync.execute(staff_id);
-//            }
-//        });
-//
-//        btnRefreshLMDInvValueT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                HashMap<String, String> val = session.getAllDetails();
-//                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
-//                @SuppressLint("StaticFieldLeak") RefreshLMDInvoiceValueT sync = new RefreshLMDInvoiceValueT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        Log.d("s", "" + s);
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute(staff_id);
-//            }
-//        });
-//
-//        btnUpdateLMDT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                HashMap<String, String> val = session.getAllDetails();
-//                String staff_id = val.get(SessionManager.KEY_STAFF_ID);
-//                @SuppressLint("StaticFieldLeak") updateLMDT sync = new SyncModule.updateLMDT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        Log.d("s", "" + s);
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute(staff_id);
-//            }
-//        });
-
-//        btnUploadLmdInvValT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpLMDInvValueT sync = new SyncModule.SyncUpLMDInvValueT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute();
-//            }
-//        });
-//
-//        btnUploadReceiptT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpReceiptTable sync = new SyncModule.SyncUpReceiptTable(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute();
-//            }
-//        });
-//
-//        btnUploadRestockT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpRestockT sync = new SyncModule.SyncUpRestockT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute();
-//            }
-//        });
-//
-//        btnUploadTellerT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpTellerT sync = new SyncModule.SyncUpTellerT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute();
-//            }
-//        });
-//
-//        btnUpdateHoldCostT.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownHoldingCostT sync = new SyncModule.SyncDownHoldingCostT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//                    @Override
-//                    protected void onPostExecute(String s) {
-//                        if (s.trim().equalsIgnoreCase("done")) {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                };
-//                sync.execute();
-//            }
-//        }
         return view;
     }
 
-//    public void SyncDownLMLInventory03T(View view) {
-//        CheckInternetPermission();
-//        HashMap<String, String> user = session.getAllDetails();
-//        @SuppressLint("StaticFieldLeak") SyncDownInventory03T syncDown = new SyncDownInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//            @Override
-//            protected void onPostExecute(String s) {
-//                if (s.trim().equalsIgnoreCase("done")) {
-//                    countUp[0]++;
-//                }
-////                else {
-////                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-////                }
-//            }
-//        };
-//        syncDown.execute(user.get(SessionManager.KEY_STAFF_ID));
-//    }
-
-//    public void SyncUpLMTCInventory03T(View view) {
-//        CheckInternetPermission();
-//        @SuppressLint("StaticFieldLeak") SyncUpInventory03T syncUp = new SyncUpInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-//            @Override
-//            protected void onPostExecute(String s) {
-//                if (s.trim().equalsIgnoreCase("done")) {
-//                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync successful", Toast.LENGTH_SHORT).show();
-//                }
-//                else {
-//                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        };
-//        syncUp.execute();
-//    }
-
-//    public void RefreshInventory03T(View view) {
-//        CheckInternetPermission();
-//        SyncUpInventory03T syncUp = new SyncUpInventory03T(getActivity());
-//        syncUp.execute();
-//
-//        RefreshInventory03T refresh = new RefreshInventory03T(getActivity());
-//        refresh.execute();
-//    }
 
     public void CheckInternetPermission() {
         try {

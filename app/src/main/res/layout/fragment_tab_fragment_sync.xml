@@ -23,7 +23,8 @@
                 android:background="@drawable/rounded_border"
                 android:text="Upload Data"
                 android:textAllCaps="true"
-                android:textColor="@color/text_color_white" />
+                android:textColor="@color/text_color_white"
+                android:padding="10dp" />
 
             <Button
                 android:id="@+id/btn_download_data"
@@ -34,7 +35,9 @@
                 android:background="@drawable/rounded_border"
                 android:text="Download Data"
                 android:textAllCaps="true"
-                android:textColor="@color/text_color_white" />
+                android:textColor="@color/text_color_white"
+                android:padding="10dp" />
+
 
             <!--<Button-->
             <!--android:id="@+id/btnSyncUpInventory03T"-->

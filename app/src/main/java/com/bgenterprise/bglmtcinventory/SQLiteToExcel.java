@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
@@ -122,9 +123,17 @@ public class SQLiteToExcel {
         startExportTables(tables, fileName, listener);
     }
 
-    public void exportAllTables(final String fileName, ExportListener listener) {
-        ArrayList<String> tables = getAllTables();
-        startExportTables(tables, fileName, listener);
+    public void exportAllTables(final String fileName, ExportListener listener, Context context) {
+        try {
+            ArrayList<String> tables = getAllTables();
+            startExportTables(tables, fileName, listener);
+        } catch (Exception e) {
+            Toast.makeText(context, "Export failed. Sync down all databases on first installation",
+                    Toast.LENGTH_SHORT).show();
+
+        }
+
+
     }
 
     private void startExportTables(final List<String> tables, final String fileName, final ExportListener listener) {
