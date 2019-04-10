@@ -41,7 +41,6 @@ public class TabFragmentSync extends Fragment {
 //            btnUpdateHoldCostT;
     Button btnUploadData, btnDownloadData;
 
-
     public TabFragmentSync() {
         // Required empty public constructor
     }

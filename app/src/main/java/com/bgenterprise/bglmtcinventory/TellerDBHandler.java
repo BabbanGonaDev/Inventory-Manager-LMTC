@@ -120,11 +120,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         } while (!cursor.isAfterLast());
 
 
-        if (current_total == tellerAmount) {
-            return true;
-        } else {
-            return false;
-        }
+        return current_total == tellerAmount;
     }
 
     public Integer getTotalReceiptAmount(String Teller_ID){
