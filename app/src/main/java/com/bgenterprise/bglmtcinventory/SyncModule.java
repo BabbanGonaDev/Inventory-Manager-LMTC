@@ -31,7 +31,7 @@ import java.util.Objects;
 
 public class SyncModule {
 
-    private static String InternetLink = "http://fe351253.ngrok.io";
+    private static String InternetLink = "http://0fc6d026.ngrok.io";
 
     public static class SyncDownInventory03T extends AsyncTask<String, String, String> {
         //This function syncs down the Inventory03T for the respective LMD.

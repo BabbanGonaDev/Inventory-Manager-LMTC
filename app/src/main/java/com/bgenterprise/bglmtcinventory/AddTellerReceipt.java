@@ -4,23 +4,19 @@ package com.bgenterprise.bglmtcinventory;
   This is the activity that handles the adding of the receipts attached to each teller
  */
 
-import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Calendar;
 import java.util.HashMap;
 
 public class AddTellerReceipt extends AppCompatActivity {
@@ -88,11 +84,11 @@ public class AddTellerReceipt extends AppCompatActivity {
         if(!tv_receipt_id.getText().toString().isEmpty() && !et_receipt_amount1.getText().toString().isEmpty() && !et_receipt_amount2.getText().toString().isEmpty() &&
                 et_receipt_amount1.getText().toString().equals(et_receipt_amount2.getText().toString())
                 ){
-
+            Log.d("HERE", "onclick reached");
             //Insert into the Teller Table.
             if(tellerDBHandler.onAdd(allDetails.get(SessionManager.KEY_TELLER_ID), allDetails.get(SessionManager.KEY_TELLER_AMOUNT), allDetails.get(SessionManager.KEY_TELLER_BANK),
-                    tv_receipt_id.getText().toString(), et_receipt_amount2.getText().toString(), allDetails.get(SessionManager.KEY_TELLER_DATE), "0", allDetails.get(SessionManager.KEY_APP_VERSION))){
-
+                    tv_receipt_id.getText().toString(), et_receipt_amount2.getText().toString(), allDetails.get(SessionManager.KEY_TELLER_DATE),
+                    "no", allDetails.get(SessionManager.KEY_APP_VERSION), SessionManager.KEY_STAFF_ID)) {
 
                 Toast.makeText(AddTellerReceipt.this, "Receipt " + tv_receipt_id.getText().toString() + " added successfully.", Toast.LENGTH_LONG).show();
                 new AlertDialog.Builder(AddTellerReceipt.this)
@@ -132,15 +128,6 @@ public class AddTellerReceipt extends AppCompatActivity {
         //Disable the back button.
         Toast.makeText(AddTellerReceipt.this, "Back Button Disabled", Toast.LENGTH_LONG).show();
     }
-
-
-
-
-
-
-
-
-
 
 
     public void DetectTotalAmount(){

@@ -46,13 +46,14 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
-    boolean onAdd_Inventory03T(String UniqueID, String TxnDate, String LMDID, String ItemID, String ItemName, String Unit, String Type, String UnitPrice, String Notes, String SyncDate, String SyncStatus) {
+    boolean onAdd_Inventory03T(String UniqueID, String TxnDate, String LMDID, String ItemID, String ItemName, String Unit, String Type, String UnitPrice,
+                               String Notes, String SyncDate, String SyncStatus, String Staff_ID) {
         try {
             //Inserts records into the Inventory03T table.
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO Inventory03T (UniqueID, TxnDate, LMDID, ItemID, ItemName, Unit, Type, UnitPrice, Notes, SyncDate, SyncStatus) " +
+            String insertQ = "INSERT INTO Inventory03T (UniqueID, TxnDate, LMDID, ItemID, ItemName, Unit, Type, UnitPrice, Notes, SyncDate, SyncStatus, Staff_ID) " +
                     "VALUES (" + "'" + UniqueID + "','" + TxnDate + "','" + LMDID + "','" + ItemID + "','" + ItemName + "','" + Unit + "','" + Type +
-                    "','" + UnitPrice + "','" + Notes + "','" + SyncDate + "','" + SyncStatus + "')";
+                    "','" + UnitPrice + "','" + Notes + "','" + SyncDate + "','" + SyncStatus + "','" + Staff_ID + "')";
 
             Log.d("CHECK", "Inventory03T InsertQ: " + insertQ);
 
@@ -93,6 +94,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
                     contentValues.put(Inventory03T.COLUMN_NOTES, jsonObject.getString("Notes"));
                     contentValues.put(Inventory03T.COLUMN_SYNC_DATE, jsonObject.getString("SyncDate"));
                     contentValues.put(Inventory03T.COLUMN_SYNC_STATUS, jsonObject.getString("SyncStatus"));
+                    contentValues.put(Inventory03T.COLUMN_STAFF_ID, jsonObject.getString("Staff_ID"));
 
                     db.insert(Inventory03T.TABLE_NAME, null, contentValues);
                 }
@@ -102,7 +104,6 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         }
 
     }
-
 
     Integer getNumberOf_FODEntries(String LMDid, String Itemid, String transDate) {
         //Gets the number of times that FOD count entries have been made in the database for a specific LMD.

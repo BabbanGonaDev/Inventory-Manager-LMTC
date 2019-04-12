@@ -7,15 +7,16 @@ package com.bgenterprise.bglmtcinventory;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.zxing.Result;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -56,7 +57,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         String[] cleanedData = result.getText().split("\\*");   //gets the scanned data without the * after
         String[] data = cleanedData[0].split(",");
 
-        switch (QRPrefs.getString("required", "")){
+        switch (Objects.requireNonNull(QRPrefs.getString("required", ""))) {
             case "LMD_Receipt":
                 try {
 
@@ -139,6 +140,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 try{
                     //check if the product id is a number of length 9
                     if ((data[1].length() != 9) || (!isDigitsOnly(data[1]))) {
+                        Log.d("data[1]", "" + data[1]);
                         Toast.makeText(getApplicationContext(), "Please scan a BG product QR code to proceed", Toast.LENGTH_LONG).show();
                         finish();
                     }

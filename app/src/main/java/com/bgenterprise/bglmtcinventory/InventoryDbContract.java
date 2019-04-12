@@ -18,6 +18,7 @@ public class InventoryDbContract {
         public static final String COLUMN_NOTES = "Notes";
         public static final String COLUMN_SYNC_DATE = "SyncDate";
         public static final String COLUMN_SYNC_STATUS = "SyncStatus";
+        public static final String COLUMN_STAFF_ID = "Staff_ID";
 
     }
 

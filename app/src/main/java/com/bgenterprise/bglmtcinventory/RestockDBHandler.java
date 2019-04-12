@@ -35,12 +35,14 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
-    public boolean onAdd_RestockT(String LMDID, String ItemID, String RestockValue, String LMDKey, String Count, String RequestDate){
+    public boolean onAdd_RestockT(String LMDID, String ItemID, String RestockValue, String LMDKey, String Count, String RequestDate, String Staff_ID,
+                                  String SyncStatus) {
 
         //Insert entries into the RestockT table.
         try{
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO RestockT(LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate) VALUES ('"+ LMDID +"','"+ ItemID +"','"+ RestockValue +"','"+ LMDKey +"','"+ Count +"','"+ RequestDate +"')";
+            String insertQ = "INSERT INTO RestockT(LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate,Staff_ID,SyncStatus) VALUES ('" + LMDID +
+                    "','" + ItemID + "','" + RestockValue + "','" + LMDKey + "','" + Count + "','" + RequestDate + "','" + Staff_ID + "','" + SyncStatus + "')";
 
             db.execSQL(insertQ);
             db.close();
@@ -76,8 +78,8 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         cursor = db.rawQuery("SELECT " + RestockT.COLUMN_LMD_ID + "," + RestockT.COLUMN_ITEM_ID + "," + RestockT.COLUMN_RESTOCK_VALUE + "," +
-                RestockT.COLUMN_LMD_KEY + "," + RestockT.COLUMN_COUNT + "," + RestockT.COLUMN_REQUEST_DATE + " FROM " + RestockT.TABLE_NAME +
-                " WHERE " + RestockT.COLUMN_SYNC_STATUS + "= 'no'", null);
+                RestockT.COLUMN_LMD_KEY + "," + RestockT.COLUMN_COUNT + "," + RestockT.COLUMN_REQUEST_DATE + "," + RestockT.COLUMN_STAFF_ID +
+                " FROM " + RestockT.TABLE_NAME + " WHERE " + RestockT.COLUMN_SYNC_STATUS + "= 'no'", null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -88,6 +90,7 @@ public class RestockDBHandler extends SQLiteAssetHelper {
             map.put("LMDKey", cursor.getString(3));
             map.put("Count", cursor.getString(4));
             map.put("RequestDate", cursor.getString(5));
+            map.put("Staff_ID", cursor.getString(6));
 
             wordList.add(map);
             cursor.moveToNext();

@@ -91,16 +91,18 @@ public class StockCount extends AppCompatActivity {
     }
 
     public void ButtonScanProduct(View view){
-//        QRPrefs.edit().putString("required", "Product_Count").commit();
-//        QRPrefs.edit().putString("scanner_title", "Scan Product to Count").commit();
+        QRPrefs.edit().putString("required", "Product_Count").commit();
+        QRPrefs.edit().putString("scanner_title", "Scan Product to Count").commit();
         startActivity(new Intent(StockCount.this, ScannerActivity.class));
 
     }
 
     public void ButtonSubmitCount(View view){
+        String firstinput = etCount.getText().toString().replaceAll("[^0-9]", "");
+        String secondInput = etConfirmCount.getText().toString().replaceFirst("[^0-9]", "");
         if(etCount.getText().toString().equals(etConfirmCount.getText().toString()) && !etCount.getText().toString().isEmpty() && !tvProductName.getText().toString().isEmpty()
                 && !tvLMDName.getText().toString().isEmpty()){
-
+            Log.d("HERE", "its equal");
             //TODO---> Calculate the last phy count and its date and deliveries since then. (Calculate it before entering into the database.)
             //Hence it would be the most recent entry with that LMDID and product ID. just get the date and count.
 
@@ -134,9 +136,13 @@ public class StockCount extends AppCompatActivity {
             updateInvoiceT(ItemId, LmdId);
 
             String UniqueID = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis());
-            if(inventoryDBHandler.onAdd_Inventory03T(UniqueID, currentDate, allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), allDetails.get(SessionManager.KEY_PRODUCT_NAME), etCount.getText().toString(), "FOD", "0", "", "", "no")){
+            if (inventoryDBHandler.onAdd_Inventory03T(UniqueID, currentDate, allDetails.get(SessionManager.KEY_LMD_ID),
+                    allDetails.get(SessionManager.KEY_PRODUCT_ID), allDetails.get(SessionManager.KEY_PRODUCT_NAME), etCount.getText().toString(),
+                    "FOD", "0", "", "", "no", SessionManager.KEY_STAFF_ID)) {
 
-                if(invoiceDBHandler.onAdd_LMDInvoiceValueT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), etCount.getText().toString(), currentDate, "FOD", myFormat.format(invoicePrice), myFormat.format(invoiceQty), myFormat.format(invoiceValue), LastFODCount, LastFODDate, String.valueOf(DeliverySinceLastCount))){
+                if (invoiceDBHandler.onAdd_LMDInvoiceValueT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID),
+                        etCount.getText().toString(), currentDate, "FOD", myFormat.format(invoicePrice), myFormat.format(invoiceQty),
+                        myFormat.format(invoiceValue), LastFODCount, LastFODDate, String.valueOf(DeliverySinceLastCount), SessionManager.KEY_STAFF_ID, "no")) {
 
                     //TODO---> RESTOCK CALCULATOR.
                     RestockModule.RestockBlock restock = new RestockModule.RestockBlock(StockCount.this);
@@ -145,7 +151,7 @@ public class StockCount extends AppCompatActivity {
                     Toast.makeText(StockCount.this, "Restock Value: " + myFormat.format(restockValue), Toast.LENGTH_LONG).show();
 
                     if(restockDBHandler.onAdd_RestockT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), myFormat.format(restockValue), allDetails.get(SessionManager.KEY_LMD_ID)+allDetails.get(SessionManager.KEY_PRODUCT_ID),
-                            etCount.getText().toString(), currentDate)){
+                            etCount.getText().toString(), currentDate, SessionManager.KEY_STAFF_ID, "no")) {
 
                         new AlertDialog.Builder(StockCount.this)
                                 .setTitle("Stock Count")

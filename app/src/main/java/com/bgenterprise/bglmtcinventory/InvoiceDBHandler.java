@@ -47,12 +47,15 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 
     //Insert into the Invoice Database.
     boolean onAdd_LMDInvoiceValueT(String LMDID, String ItemID, String FODPhysicalCount, String TxnDate, String Type, String UnitPrice,
-                                   String InvoiceQty, String InvoiceValue, String LastFODCount, String LastFODDate, String DeliverySinceLastCount) {
+                                   String InvoiceQty, String InvoiceValue, String LastFODCount, String LastFODDate, String DeliverySinceLastCount,
+                                   String Staff_ID, String SyncStatus) {
 
         try{
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO LMDInvoiceValueT (LMDID, ItemID, FODPhysicalCount, TxnDate, Type, UnitPrice, InvoiceQty, InvoiceValue, LastFODCount, LastFODdate, DeliverySinceLastCount) VALUES (" +
-                    "'" + LMDID + "','" + ItemID + "','" + FODPhysicalCount + "','" + TxnDate + "','" + Type + "','" + UnitPrice + "','" + InvoiceQty + "','" + InvoiceValue+ "','" + LastFODCount + "','"+ LastFODDate +"','"+ DeliverySinceLastCount + "')";
+            String insertQ = "INSERT INTO LMDInvoiceValueT (LMDID, ItemID, FODPhysicalCount, TxnDate, Type, UnitPrice, InvoiceQty, InvoiceValue, LastFODCount," +
+                    " LastFODdate, DeliverySinceLastCount, Staff_ID, SyncStatus) VALUES (" + "'" + LMDID + "','" + ItemID + "','" + FODPhysicalCount + "','" + TxnDate
+                    + "','" + Type + "','" + UnitPrice + "','" + InvoiceQty + "','" + InvoiceValue + "','" + LastFODCount + "','" + LastFODDate +
+                    "','" + DeliverySinceLastCount + "','" + Staff_ID + "','" + SyncStatus + "')";
             Log.d("CHECK", "Insert into LMDInvoiceValueT Query: " + insertQ);
             db.execSQL(insertQ);
             db.close();
@@ -452,6 +455,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                     contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, jsonObject.getString("HoldingCost"));
                     contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_DATE, jsonObject.getString("SyncDate"));
                     contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_STATUS, jsonObject.getString("SyncStatus"));
+                    contentValues.put(LMDInvoiceValueT.COLUMN_STAFF_ID, jsonObject.getString("Staff_ID"));
 
                     db.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
                 }
@@ -471,7 +475,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 LMDInvoiceValueT.COLUMN_FOD_PHYSICAL_COUNT + "," + LMDInvoiceValueT.COLUMN_TXN_DATE + "," + LMDInvoiceValueT.COLUMN_TYPE + "," +
                 LMDInvoiceValueT.COLUMN_UNIT_PRICE + "," + LMDInvoiceValueT.COLUMN_INVOICE_QTY + "," + LMDInvoiceValueT.COLUMN_INVOICE_VALUE + "," +
                 LMDInvoiceValueT.COLUMN_LAST_FOD_COUNT + "," + LMDInvoiceValueT.COLUMN_LAST_FOD_DATE + "," + LMDInvoiceValueT.COLUMN_DELIVERY_SINCE_LAST_COUNT
-                + "," + LMDInvoiceValueT.COLUMN_HOLDING_COST + " FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE " + LMDInvoiceValueT.COLUMN_SYNC_STATUS +
+                + "," + LMDInvoiceValueT.COLUMN_HOLDING_COST + "," + LMDInvoiceValueT.COLUMN_STAFF_ID + " FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE " + LMDInvoiceValueT.COLUMN_SYNC_STATUS +
                 " = 'no'", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -489,6 +493,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
             map.put("LastFODdate", cursor.getString(10));
             map.put("DeliverySinceLastCount", cursor.getString(11));
             map.put("HoldingCost", cursor.getString(12));
+            map.put("Staff_ID", cursor.getString(13));
 
             wordList.add(map);
             cursor.moveToNext();

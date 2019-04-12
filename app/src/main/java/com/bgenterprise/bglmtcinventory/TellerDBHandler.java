@@ -40,13 +40,14 @@ public class TellerDBHandler extends SQLiteAssetHelper {
     }
 
     public boolean onAdd(String teller_id, String teller_amount, String teller_bank, String receipt_id, String receipt_amount,
-                         String teller_date, String sync_status, String app_version) {
+                         String teller_date, String sync_status, String app_version, String Staff_ID) {
 
         //Inserts entries into the teller table.
         try {
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO teller_table (teller_id, teller_amount, teller_bank, receipt_id, receipt_amount, teller_date, sync_status, app_version) VALUES " +
-                    "('" + teller_id + "','" + teller_amount + "','" + teller_bank + "','" + receipt_id + "','" + receipt_amount + "','" + teller_date + "','" + sync_status + "','" + app_version + "')";
+            String insertQ = "INSERT INTO teller_table (teller_id, teller_amount, teller_bank, receipt_id, receipt_amount, teller_date, SyncStatus, app_version, Staff_ID) VALUES " +
+                    "('" + teller_id + "','" + teller_amount + "','" + teller_bank + "','" + receipt_id + "','" + receipt_amount + "','" + teller_date +
+                    "','" + sync_status + "','" + app_version + "','" + Staff_ID + "')";
             db.execSQL(insertQ);
             db.close();
             return true;
@@ -148,7 +149,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
 
         cursor = db.rawQuery("SELECT " + teller_table.COLUMN_TELLER_ID + "," + teller_table.COLUMN_TELLER_AMOUNT + "," + teller_table.COLUMN_TELLER_BANK
                 + "," + teller_table.COLUMN_RECEIPT_ID + "," + teller_table.COLUMN_RECEIPT_AMOUNT + "," + teller_table.COLUMN_TELLER_DATE + "," +
-                teller_table.COLUMN_APP_VERSION + " FROM " + teller_table.TABLE_NAME + " WHERE " + teller_table.COLUMN_SYNC_STATUS + " = 'no'", null);
+                teller_table.COLUMN_APP_VERSION + "," + teller_table.COLUMN_STAFF_ID + " FROM " + teller_table.TABLE_NAME + " WHERE " + teller_table.COLUMN_SYNC_STATUS + " = 'no'", null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -160,6 +161,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
             map.put("receipt_amount", cursor.getString(4));
             map.put("teller_date", cursor.getString(5));
             map.put("app_version", cursor.getString(6));
+            map.put("Staff_ID", cursor.getString(7));
 
             wordList.add(map);
             cursor.moveToNext();
