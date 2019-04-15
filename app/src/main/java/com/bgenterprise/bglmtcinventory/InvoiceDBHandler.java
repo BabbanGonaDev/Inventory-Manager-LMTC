@@ -158,6 +158,20 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return totalInvoices;
     }
 
+    Integer getTotalInvoicesCount(String LMDid, String item_id) {
+        int totalInvoices;
+
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(InvoiceValue) FROM LMDInvoiceValueT WHERE LMDID = '" + LMDid + "' AND ItemID = '" + item_id + "'", null);
+        c.moveToFirst();
+
+        totalInvoices = c.getInt(0);
+
+        c.close();
+        db.close();
+        return totalInvoices;
+    }
+
     //Get total LMD's Invoices.
     Double getLMDsInvoices(String lmdid) {
         double amount = 0.0;

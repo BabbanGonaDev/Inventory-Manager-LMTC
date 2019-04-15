@@ -131,6 +131,7 @@ public class StockCount extends AppCompatActivity {
             HashMap<String,String> val = session.getAllDetails();
             String ItemId = val.get(SessionManager.KEY_PRODUCT_ID);
             String LmdId = val.get(SessionManager.KEY_LMD_ID);
+            String staff_ID = val.get(SessionManager.KEY_STAFF_ID);
 
 //            update LMDInvoiceValue table with holding cost entry
             updateInvoiceT(ItemId, LmdId);
@@ -138,11 +139,11 @@ public class StockCount extends AppCompatActivity {
             String UniqueID = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis());
             if (inventoryDBHandler.onAdd_Inventory03T(UniqueID, currentDate, allDetails.get(SessionManager.KEY_LMD_ID),
                     allDetails.get(SessionManager.KEY_PRODUCT_ID), allDetails.get(SessionManager.KEY_PRODUCT_NAME), etCount.getText().toString(),
-                    "FOD", "0", "", "", "no", SessionManager.KEY_STAFF_ID)) {
+                    "FOD", "0", "", "", "no", staff_ID)) {
 
                 if (invoiceDBHandler.onAdd_LMDInvoiceValueT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID),
                         etCount.getText().toString(), currentDate, "FOD", myFormat.format(invoicePrice), myFormat.format(invoiceQty),
-                        myFormat.format(invoiceValue), LastFODCount, LastFODDate, String.valueOf(DeliverySinceLastCount), SessionManager.KEY_STAFF_ID, "no")) {
+                        myFormat.format(invoiceValue), LastFODCount, LastFODDate, String.valueOf(DeliverySinceLastCount), staff_ID, "no")) {
 
                     //TODO---> RESTOCK CALCULATOR.
                     RestockModule.RestockBlock restock = new RestockModule.RestockBlock(StockCount.this);
@@ -151,7 +152,7 @@ public class StockCount extends AppCompatActivity {
                     Toast.makeText(StockCount.this, "Restock Value: " + myFormat.format(restockValue), Toast.LENGTH_LONG).show();
 
                     if(restockDBHandler.onAdd_RestockT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), myFormat.format(restockValue), allDetails.get(SessionManager.KEY_LMD_ID)+allDetails.get(SessionManager.KEY_PRODUCT_ID),
-                            etCount.getText().toString(), currentDate, SessionManager.KEY_STAFF_ID, "no")) {
+                            etCount.getText().toString(), currentDate, allDetails.get(SessionManager.KEY_STAFF_ID), "no")) {
 
                         new AlertDialog.Builder(StockCount.this)
                                 .setTitle("Stock Count")

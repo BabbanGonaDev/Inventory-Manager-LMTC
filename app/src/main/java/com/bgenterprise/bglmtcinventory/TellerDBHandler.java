@@ -40,19 +40,20 @@ public class TellerDBHandler extends SQLiteAssetHelper {
     }
 
     public boolean onAdd(String teller_id, String teller_amount, String teller_bank, String receipt_id, String receipt_amount,
-                         String teller_date, String sync_status, String app_version, String Staff_ID) {
+                         String teller_date, String sync_status, String app_version, String Staff_ID, String uniqueID) {
 
         //Inserts entries into the teller table.
         try {
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO teller_table (teller_id, teller_amount, teller_bank, receipt_id, receipt_amount, teller_date, SyncStatus, app_version, Staff_ID) VALUES " +
+            String insertQ = "INSERT INTO teller_table (teller_id, teller_amount, teller_bank, receipt_id, receipt_amount, teller_date, SyncStatus, app_version, Staff_ID,UniqueID) VALUES " +
                     "('" + teller_id + "','" + teller_amount + "','" + teller_bank + "','" + receipt_id + "','" + receipt_amount + "','" + teller_date +
-                    "','" + sync_status + "','" + app_version + "','" + Staff_ID + "')";
+                    "','" + sync_status + "','" + app_version + "','" + Staff_ID + "','" + uniqueID + "')";
             db.execSQL(insertQ);
             db.close();
             return true;
 
         } catch (Exception e) {
+            Log.d("Prob", "" + e);
             return false;
         }
     }
@@ -149,7 +150,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
 
         cursor = db.rawQuery("SELECT " + teller_table.COLUMN_TELLER_ID + "," + teller_table.COLUMN_TELLER_AMOUNT + "," + teller_table.COLUMN_TELLER_BANK
                 + "," + teller_table.COLUMN_RECEIPT_ID + "," + teller_table.COLUMN_RECEIPT_AMOUNT + "," + teller_table.COLUMN_TELLER_DATE + "," +
-                teller_table.COLUMN_APP_VERSION + "," + teller_table.COLUMN_STAFF_ID + " FROM " + teller_table.TABLE_NAME + " WHERE " + teller_table.COLUMN_SYNC_STATUS + " = 'no'", null);
+                teller_table.COLUMN_APP_VERSION + "," + teller_table.COLUMN_STAFF_ID + "," + teller_table.COLUMN_UNIQUE_ID + " FROM " + teller_table.TABLE_NAME + " WHERE " + teller_table.COLUMN_SYNC_STATUS + " = 'no'", null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -162,6 +163,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
             map.put("teller_date", cursor.getString(5));
             map.put("app_version", cursor.getString(6));
             map.put("Staff_ID", cursor.getString(7));
+            map.put("UniqueID", cursor.getString(8));
 
             wordList.add(map);
             cursor.moveToNext();
@@ -177,8 +179,8 @@ public class TellerDBHandler extends SQLiteAssetHelper {
             try {
                 jsonObject = jsonArray.getJSONObject(i);
                 db.execSQL("UPDATE " + teller_table.TABLE_NAME + " SET " + teller_table.COLUMN_SYNC_STATUS + " = '" + jsonObject.getString("SyncStatus")
-                        + "', " + teller_table.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + teller_table.COLUMN_TELLER_ID +
-                        " = \"" + jsonObject.getString("teller_id") + "\"");
+                        + "', " + teller_table.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + teller_table.COLUMN_UNIQUE_ID +
+                        " = \"" + jsonObject.getString("UniqueID") + "\"");
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.d("TellerTSyncStatusEx", e + "");

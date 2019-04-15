@@ -83,6 +83,7 @@ public class InvoiceDbContract {
         public static final String COLUMN_APP_VERSION = "app_version";
         public static final String COLUMN_SYNC_DATE = "SyncDate";
         public static final String COLUMN_STAFF_ID = "Staff_ID";
+        public static final String COLUMN_UNIQUE_ID = "UniqueID";
 
     }
 

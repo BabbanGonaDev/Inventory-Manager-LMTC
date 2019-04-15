@@ -17,10 +17,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.HashMap;
 
 public class AddTellerReceipt extends AppCompatActivity {
-    Button btnScanReceiptID, btnSubmitReceiptDetails;
+    Button btnScanReceiptID, btnSubmitReceiptDetails, btnHome;
     TextView tv_receipt_id;
     EditText et_receipt_amount1, et_receipt_amount2;
     SharedPreferences QRPrefs;
@@ -38,12 +39,13 @@ public class AddTellerReceipt extends AppCompatActivity {
         tellerDBHandler = new TellerDBHandler(AddTellerReceipt.this);
 
         btnScanReceiptID = findViewById(R.id.btnScanReceiptID);
+        btnHome = findViewById(R.id.btnHome);
         btnSubmitReceiptDetails = findViewById(R.id.btnSubmitReceiptDetails);
         tv_receipt_id = findViewById(R.id.tv_receipt_id);
         et_receipt_amount1 = findViewById(R.id.et_receipt_amount1);
         et_receipt_amount2 = findViewById(R.id.et_receipt_amount2);
 
-
+        Intent starterIntent = getIntent();
 
         /*//Check for total teller amount.
         DetectTotalAmount();*/
@@ -55,6 +57,30 @@ public class AddTellerReceipt extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ButtonScanReceiptID(v);
+            }
+        });
+
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(AddTellerReceipt.this)
+                        .setTitle("Confirm Action")
+                        .setMessage("Are you sure you want to go home without collecting any payment ?")
+                        .setPositiveButton("Yes, Go Home", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                session.CLEAR_TELLER_DETAILS();
+                                session.CLEAR_TELLER_RECEIPT_DETAILS();
+                                finish();
+                                startActivity(new Intent(AddTellerReceipt.this, Operations.class));
+                            }
+                        })
+                        .setNegativeButton("No, Wait.", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
             }
         });
 
@@ -85,10 +111,14 @@ public class AddTellerReceipt extends AppCompatActivity {
                 et_receipt_amount1.getText().toString().equals(et_receipt_amount2.getText().toString())
                 ){
             Log.d("HERE", "onclick reached");
+            Date now = new Date();
+            String now_string = String.valueOf(now);
+            String uniqueID = SessionManager.KEY_STAFF_ID + "_" + now_string + "_T";
+
             //Insert into the Teller Table.
             if(tellerDBHandler.onAdd(allDetails.get(SessionManager.KEY_TELLER_ID), allDetails.get(SessionManager.KEY_TELLER_AMOUNT), allDetails.get(SessionManager.KEY_TELLER_BANK),
                     tv_receipt_id.getText().toString(), et_receipt_amount2.getText().toString(), allDetails.get(SessionManager.KEY_TELLER_DATE),
-                    "no", allDetails.get(SessionManager.KEY_APP_VERSION), SessionManager.KEY_STAFF_ID)) {
+                    "no", allDetails.get(SessionManager.KEY_APP_VERSION), allDetails.get(SessionManager.KEY_STAFF_ID), uniqueID)) {
 
                 Toast.makeText(AddTellerReceipt.this, "Receipt " + tv_receipt_id.getText().toString() + " added successfully.", Toast.LENGTH_LONG).show();
                 new AlertDialog.Builder(AddTellerReceipt.this)
@@ -100,6 +130,9 @@ public class AddTellerReceipt extends AppCompatActivity {
                                 session.CLEAR_TELLER_RECEIPT_DETAILS();
                                 et_receipt_amount1.setText("");
                                 et_receipt_amount2.setText("");
+//                                Intent intent = getIntent();
+//                                finish();
+//                                startActivity(intent);
                                 recreate();
                             }
                         })
@@ -113,7 +146,6 @@ public class AddTellerReceipt extends AppCompatActivity {
                         }).show();
             }
 
-
         }else{
             Toast.makeText(AddTellerReceipt.this, "Kindly Check Details Again", Toast.LENGTH_LONG).show();
             et_receipt_amount1.setText("");
@@ -122,13 +154,11 @@ public class AddTellerReceipt extends AppCompatActivity {
 
     }
 
-
     @Override
     public void onBackPressed(){
         //Disable the back button.
         Toast.makeText(AddTellerReceipt.this, "Back Button Disabled", Toast.LENGTH_LONG).show();
     }
-
 
     public void DetectTotalAmount(){
         //The purpose of this function is to monitor and detect when the total amount for the teller has been entered.
@@ -154,6 +184,11 @@ public class AddTellerReceipt extends AppCompatActivity {
                         }
                     }).show();
         }
+    }
+
+    @Override
+    public void recreate() {
+        super.recreate();
     }
 
 }

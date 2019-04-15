@@ -39,13 +39,13 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
     }
 
     public boolean onAdd(String receipt_id, String lmd_name, String lmd_id, String lmd_hub, String amount,
-                         String moneycollectedby, String staff_id, String date, String sync_status, String appVersion){
+                         String moneycollectedby, String staff_id, String date, String SyncStatus, String appVersion) {
         //Inserts entries into the Receipt table.
 
         try{
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO receipt_table (receipt_id, lmd_name, lmd_id, lmd_hub, amount, moneycollectedby, staff_id, date, sync_status, appVersion) VALUES " +
-                    "('" + receipt_id + "','" + lmd_name + "','" + lmd_id + "','" + lmd_hub + "','" + amount + "','" + moneycollectedby + "','" + staff_id + "','" + date + "','" + sync_status + "','" + appVersion + "')";
+            String insertQ = "INSERT INTO receipt_table (receipt_id, lmd_name, lmd_id, lmd_hub, amount, moneycollectedby, staff_id, date, SyncStatus, appVersion) VALUES " +
+                    "('" + receipt_id + "','" + lmd_name + "','" + lmd_id + "','" + lmd_hub + "','" + amount + "','" + moneycollectedby + "','" + staff_id + "','" + date + "','" + SyncStatus + "','" + appVersion + "')";
             db.execSQL(insertQ);
             db.close();
             return true;
@@ -78,7 +78,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()){
             list.add(new Receipts(cursor.getString(cursor.getColumnIndex("receipt_id")), cursor.getString(cursor.getColumnIndex("amount")), cursor.getString(cursor.getColumnIndex("moneycollectedby")),
-                    cursor.getString(cursor.getColumnIndex("date")), cursor.getString(cursor.getColumnIndex("sync_status"))));
+                    cursor.getString(cursor.getColumnIndex("date")), cursor.getString(cursor.getColumnIndex("SyncStatus"))));
             cursor.moveToNext();
         }
 

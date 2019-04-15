@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -198,7 +198,7 @@ public class NewReceipt extends AppCompatActivity {
 
                             ReceiptDBHandler receiptDBHandler = new ReceiptDBHandler(NewReceipt.this);
                             if(receiptDBHandler.onAdd(tvReceiptDetails.getText().toString(), tvLMDName.getText().toString(), allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_LMD_HUB), etAmount1.getText().toString(),
-                                    tvFOD.getText().toString(), allDetails.get(SessionManager.KEY_STAFF_ID), allDetails.get(SessionManager.KEY_DATE_1), "0", allDetails.get(SessionManager.KEY_APP_VERSION))){
+                                    tvFOD.getText().toString(), allDetails.get(SessionManager.KEY_STAFF_ID), allDetails.get(SessionManager.KEY_DATE_1), "no", allDetails.get(SessionManager.KEY_APP_VERSION))) {
                                 Toast.makeText(NewReceipt.this, "Receipt Saved Successfully", Toast.LENGTH_LONG).show();
 
                                 session.CLEAR_LMD_DETAILS();

@@ -24,6 +24,7 @@
         android:id="@+id/tv_staffName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:text="TextView" />
 
     <TextView
@@ -38,10 +39,10 @@
         android:layout_height="wrap_content"
         android:text="TextView" />
 
-    <TextView
-        android:id="@+id/tv_lastSync"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <!--<TextView-->
+    <!--android:id="@+id/tv_lastSync"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="TextView" />-->
 
 </LinearLayout>

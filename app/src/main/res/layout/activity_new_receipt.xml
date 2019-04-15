@@ -24,8 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
+            android:padding="30dp">
 
             <TextView
                 android:id="@+id/tvLMDName"
@@ -83,6 +82,8 @@
                         android:id="@+id/tvDate1"
                         android:layout_width="0dp"
                         android:layout_height="30dp"
+                        android:textSize="20dp"
+                        android:textColor="@color/text_black"
                         android:layout_weight="1"
                         android:text="TextView"
                         android:textAlignment="center" />
@@ -91,9 +92,12 @@
                         android:id="@+id/tvDate2"
                         android:layout_width="0dp"
                         android:layout_height="30dp"
+                        android:textSize="20dp"
+                        android:textColor="@color/text_black"
                         android:layout_weight="1"
                         android:text="TextView"
                         android:textAlignment="center" />
+
                 </LinearLayout>
             </RelativeLayout>
 
