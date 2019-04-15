@@ -66,7 +66,8 @@ public class RestockModule {
 
             long dateDiff = GetLastInvDateDifference();
 
-            double salesRate = invoiceValue / Double.longBitsToDouble(dateDiff);
+            double salesRate = invoiceValue / (dateDiff);
+            Log.d("CHECK SalesRate", "" + salesRate);
 
             return salesRate;
         }

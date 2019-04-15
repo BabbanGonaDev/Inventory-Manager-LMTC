@@ -134,16 +134,16 @@ public class InvoiceModule {
             return totalInvoices;
         }
 
-        public Integer getTotalInvoicesCount(String LMD_ID, String Item_ID) {
-
-            //Gets the total amount of invoices generated for an Item for a specific LMD.
-            InvoiceDBHandler db = new InvoiceDBHandler(context);
-            int totalInvoices = db.getTotalInvoicesCount(LMD_ID, Item_ID);
-
-            Log.d("CHECK", "Total Invoices: " + String.valueOf(totalInvoices));
-
-            return totalInvoices;
-        }
+//        public Integer getTotalInvoicesCount(String LMD_ID, String Item_ID) {
+//
+//            //Gets the total amount of invoices generated for an Item for a specific LMD.
+//            InvoiceDBHandler db = new InvoiceDBHandler(context);
+//            int totalInvoices = db.getTotalInvoicesCount(LMD_ID, Item_ID);
+//
+//            Log.d("CHECK", "Total Invoices: " + String.valueOf(totalInvoices));
+//
+//            return totalInvoices;
+//        }
 
         public Double calculateInvoiceQuantity(Integer prod_count, String lmdid, String itemid){
             //Calculate and returns the final Invoice Quantity.
@@ -155,13 +155,10 @@ public class InvoiceModule {
             Double invoice = Double.valueOf(getTotalInvoices(lmdid, itemid));
             Log.d("CHECK", "Double value of invoice: " + myFormat.format(invoice));
 
-            Double invoice2 = Double.valueOf(getTotalInvoicesCount(lmdid, itemid));
-            Log.d("CHECK", "Double value of invoice: " + myFormat.format(invoice2));
-
             Double count = Double.valueOf(prod_count);
             Log.d("CHECK", "Double value of count: " + myFormat.format(count));
 
-            Double invoiceQty = delivery - invoice2 - count;
+            Double invoiceQty = delivery - invoice - count;
 
             Log.d("CHECK", "Final InvoiceQty: " + myFormat.format(invoiceQty));
 
