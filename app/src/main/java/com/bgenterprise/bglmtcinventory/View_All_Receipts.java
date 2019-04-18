@@ -5,16 +5,16 @@ package com.bgenterprise.bglmtcinventory;
  */
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class View_All_Receipts extends AppCompatActivity {
         setContentView(R.layout.activity_view__all__receipts);
         ReceiptRecycler = findViewById(R.id.ReceiptRecycler);
 
-        Toolbar searchToolbar = (Toolbar) findViewById(R.id.SearchToolbar);
+        Toolbar searchToolbar = findViewById(R.id.SearchToolbar);
         setSupportActionBar(searchToolbar);
 
         receiptsList = new ArrayList<>();
@@ -84,7 +84,6 @@ public class View_All_Receipts extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
                 allReceiptsAdapter.getFilter().filter(newText);
                 return true;
             }

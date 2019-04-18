@@ -19,6 +19,7 @@ public class TellersAdapter extends RecyclerView.Adapter<TellersAdapter.TellersV
 
     private final OnItemClickListener listener;
     private List<Tellers> tellersList;
+    private List<Tellers> mFilteredList;
     Context context;
 
     public TellersAdapter(Context context, List<Tellers> tellersList, OnItemClickListener listener){
@@ -52,6 +53,46 @@ public class TellersAdapter extends RecyclerView.Adapter<TellersAdapter.TellersV
     public interface OnItemClickListener{
         void onClick(Tellers tellers);
     }
+
+//    @Override
+//    public Filter getFilter(){
+//
+//        return new Filter(){
+//            @Override
+//            protected FilterResults performFiltering(CharSequence charSequence){
+//
+//                String charString = charSequence.toString();
+//
+//                if(charString.isEmpty()){
+//
+//                    mFilteredList = tellersList;
+//                }else{
+//
+//                    List<Tellers> filteredList = new ArrayList<>();
+//
+//                    for(Tellers tellers : tellersList){
+//
+//                        if(tellers.getTeller_id().toLowerCase().contains(charString) || tellers.getTeller_bank().toLowerCase().contains(charString)){
+//
+//                            filteredList.add(tellers);
+//                        }
+//                    }
+//                    mFilteredList = filteredList;
+//                }
+//
+//                FilterResults filterResults = new FilterResults();
+//                filterResults.values = mFilteredList;
+//                return filterResults;
+//            }
+//
+//            @Override
+//            protected void publishResults(CharSequence charSequence, FilterResults filterResults){
+//
+//                mFilteredList = (List<Tellers>) filterResults.values;
+//                notifyDataSetChanged();
+//            }
+//        };
+//    }
 
     public class TellersViewHolder extends RecyclerView.ViewHolder{
 

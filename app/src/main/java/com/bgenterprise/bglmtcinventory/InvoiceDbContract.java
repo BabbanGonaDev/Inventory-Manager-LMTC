@@ -11,6 +11,7 @@ public class InvoiceDbContract {
         public static final String COLUMN_ITEM_ID = "ItemID";
         public static final String COLUMN_FOD_PHYSICAL_COUNT = "FODPhysicalCount";
         public static final String COLUMN_INVOICE_QTY = "InvoiceQty";
+        public static final String COLUMN_INPUT_DIST_QTY = "InputDistQty";
         public static final String COLUMN_TXN_DATE = "TxnDate";
         public static final String COLUMN_TYPE = "Type";
         public static final String COLUMN_UNIT_PRICE = "UnitPrice";
@@ -84,6 +85,15 @@ public class InvoiceDbContract {
         public static final String COLUMN_SYNC_DATE = "SyncDate";
         public static final String COLUMN_STAFF_ID = "Staff_ID";
         public static final String COLUMN_UNIQUE_ID = "UniqueID";
+
+    }
+
+    public static abstract class LeadTimeT implements BaseColumns {
+        public static final String TABLE_NAME = "LeadTimeT";
+        public static final String COLUMN_LMD_ID = "LmdID";
+        public static final String COLUMN_ITEM_ID = "ItemID";
+        public static final String COLUMN_LEAD_TIME = "LeadTime";
+        public static final String COLUMN_SYNC_DATE = "SyncDate";
 
     }
 

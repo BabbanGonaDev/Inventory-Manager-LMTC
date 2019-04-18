@@ -99,8 +99,6 @@ public class InvoiceModule {
             //4. return the gotten price. One variable used by everyone.
             return ItemPrice;
         }
-
-
     }
 
 
@@ -146,6 +144,8 @@ public class InvoiceModule {
 //        }
 
         public Double calculateInvoiceQuantity(Integer prod_count, String lmdid, String itemid){
+            InvoiceDBHandler db = new InvoiceDBHandler(context);
+
             //Calculate and returns the final Invoice Quantity.
             DecimalFormat myFormat = new DecimalFormat("#########.###");
 
@@ -158,7 +158,31 @@ public class InvoiceModule {
             Double count = Double.valueOf(prod_count);
             Log.d("CHECK", "Double value of count: " + myFormat.format(count));
 
-            Double invoiceQty = delivery - invoice - count;
+            Double idCount = (double) db.getTotalIdQty(lmdid, itemid);
+            Log.d("CHECK", "Double value of IDcount: " + myFormat.format(idCount));
+
+            Double invoiceQty = delivery - invoice - idCount - count;
+
+            Log.d("CHECK", "Final InvoiceQty: " + myFormat.format(invoiceQty));
+
+            return invoiceQty;
+        }
+
+        public Double calcInvQtyForRestock(Integer prod_count, String lmdid, String itemid) {
+            InvoiceDBHandler db = new InvoiceDBHandler(context);
+
+            DecimalFormat myFormat = new DecimalFormat("#########.###");
+
+            Double delivery = Double.valueOf(getTotalLMLDelivery(lmdid, itemid));
+
+            Double invoice = Double.valueOf(getTotalInvoices(lmdid, itemid));
+
+            Double count = Double.valueOf(prod_count);
+
+            Double idCount = (double) db.getTotalIdQtyForRestock(lmdid, itemid);
+            Log.d("CHECK", "Double value of IDcountForRestock: " + myFormat.format(idCount));
+
+            Double invoiceQty = delivery - invoice - idCount - count;
 
             Log.d("CHECK", "Final InvoiceQty: " + myFormat.format(invoiceQty));
 

@@ -110,6 +110,8 @@ public class StockCount extends AppCompatActivity {
 
             String LastFODCount = lastCountDetails.get("FODPhysicalCount");
             String LastFODDate = lastCountDetails.get("TxnDate");
+            int lastCount = Integer.valueOf(LastFODCount);
+            Log.d("lastCount", "" + lastCount);
 
             //Get the total Ins and Outs since the lastFODdate.
             int DeliverySinceLastCount = inventoryDBHandler.DeliveriesSinceLastCount(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), LastFODDate);
@@ -121,6 +123,7 @@ public class StockCount extends AppCompatActivity {
 
             InvoiceModule.InvoiceBlock invoiceBlock = new InvoiceModule.InvoiceBlock(StockCount.this);
             Double invoiceQty = invoiceBlock.calculateInvoiceQuantity(Integer.parseInt(etCount.getText().toString()), allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID));
+            Double invoiceQtyForRestock = invoiceBlock.calcInvQtyForRestock(Integer.parseInt(etCount.getText().toString()), allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID));
 
             Double invoiceValue = invoicePrice * invoiceQty;
             Log.d("CHECK", "Invoice Value: " + invoiceValue.toString());
@@ -134,9 +137,9 @@ public class StockCount extends AppCompatActivity {
             String staff_ID = val.get(SessionManager.KEY_STAFF_ID);
 
 //            update LMDInvoiceValue table with holding cost entry
-            updateInvoiceT(ItemId, LmdId);
+//            updateInvoiceT(ItemId, LmdId);
 
-            String UniqueID = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis());
+            String UniqueID = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis()) + "_FOD";
             if (inventoryDBHandler.onAdd_Inventory03T(UniqueID, currentDate, allDetails.get(SessionManager.KEY_LMD_ID),
                     allDetails.get(SessionManager.KEY_PRODUCT_ID), allDetails.get(SessionManager.KEY_PRODUCT_NAME), etCount.getText().toString(),
                     "FOD", "0", "", "", "no", staff_ID)) {
@@ -145,44 +148,42 @@ public class StockCount extends AppCompatActivity {
                         etCount.getText().toString(), currentDate, "FOD", myFormat.format(invoicePrice), myFormat.format(invoiceQty),
                         myFormat.format(invoiceValue), LastFODCount, LastFODDate, String.valueOf(DeliverySinceLastCount), staff_ID, "no")) {
 
-                    //TODO---> RESTOCK CALCULATOR.
                     RestockModule.RestockBlock restock = new RestockModule.RestockBlock(StockCount.this);
-                    Double restockValue = restock.CalcRestockValue(invoiceValue);
+                    Double restockValue = restock.CalcRestockValue(invoiceQtyForRestock, ItemId, LmdId);
 
                     Toast.makeText(StockCount.this, "Restock Value: " + myFormat.format(restockValue), Toast.LENGTH_LONG).show();
 
-                    if(restockDBHandler.onAdd_RestockT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), myFormat.format(restockValue), allDetails.get(SessionManager.KEY_LMD_ID)+allDetails.get(SessionManager.KEY_PRODUCT_ID),
-                            etCount.getText().toString(), currentDate, allDetails.get(SessionManager.KEY_STAFF_ID), "no")) {
-
-                        new AlertDialog.Builder(StockCount.this)
-                                .setTitle("Stock Count")
-                                .setMessage("Product Count Saved, Do you want to count another product for this LMD ?")
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        session.CLEAR_COUNT_DETAILS();
-                                        etCount.setText("");
-                                        etConfirmCount.setText("");
-                                        recreate();
-                                    }
-                                })
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        session.CLEAR_COUNT_DETAILS();
-
-                                        //No longer clear LMD since we are moving on.
-                                        /*session.CLEAR_LMD_DETAILS();*/
-
-                                        startActivity(new Intent(StockCount.this, View_Receivable.class));
-                                    }
-                                }).show();
-
-                    }else{
-                        Toast.makeText(StockCount.this, "Error in saving Restock Value", Toast.LENGTH_LONG).show();
+                    if (lastCount <= restockValue) {
+                        if (restockDBHandler.onAdd_RestockT(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), myFormat.format(restockValue), allDetails.get(SessionManager.KEY_LMD_ID) + allDetails.get(SessionManager.KEY_PRODUCT_ID),
+                                etCount.getText().toString(), currentDate, allDetails.get(SessionManager.KEY_STAFF_ID), "no")) {
+                        } else {
+                            Toast.makeText(StockCount.this, "Error in saving Restock Value", Toast.LENGTH_LONG).show();
+                        }
                     }
 
-                }else{
+                    new AlertDialog.Builder(StockCount.this)
+                            .setTitle("Stock Count")
+                            .setMessage("Product Count Saved, Do you want to count another product for this LMD ?")
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    session.CLEAR_COUNT_DETAILS();
+                                    etCount.setText("");
+                                    etConfirmCount.setText("");
+                                    recreate();
+                                }
+                            })
+                            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    session.CLEAR_COUNT_DETAILS();
+                                    //No longer clear LMD since we are moving on.
+                                    /*session.CLEAR_LMD_DETAILS();*/
+
+                                    startActivity(new Intent(StockCount.this, View_Receivable.class));
+                                }
+                            }).show();
+                } else {
                     Toast.makeText(StockCount.this, "Error in inserting LMDInvoiceValueT", Toast.LENGTH_LONG).show();
                 }
             }else{

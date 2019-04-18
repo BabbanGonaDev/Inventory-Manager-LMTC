@@ -60,24 +60,27 @@ public class RestockModule {
 
         }
 
-
         public Double CalcSalesRate(Double invoiceValue){
             //This function calculates the sales rate by dividing the invoice value by the number of days.
 
             long dateDiff = GetLastInvDateDifference();
-
-            double salesRate = invoiceValue / (dateDiff);
+            if (dateDiff == 0) {
+                dateDiff = 1;
+            }
+            double salesRate;
+            salesRate = invoiceValue / dateDiff;
             Log.d("CHECK SalesRate", "" + salesRate);
 
             return salesRate;
         }
 
-        public Double CalcRestockValue(Double invoiceV){
+        public Double CalcRestockValue(Double invoiceQty, String itemID, String lmdID) {
             //This function calculates and returns the final Restock value.
+            InvoiceDBHandler invoiceHandler = new InvoiceDBHandler(context);
+            int leadTime = invoiceHandler.getLeadTime(itemID, lmdID);
+            double SalesRate = CalcSalesRate(invoiceQty);
 
-            double SalesRate = CalcSalesRate(invoiceV);
-
-            double restockValue = SalesRate * 5;
+            double restockValue = SalesRate * leadTime;
 
             return restockValue;
         }

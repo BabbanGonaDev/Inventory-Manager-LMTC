@@ -52,18 +52,7 @@ public class TabFragmentSync extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_tab_fragment_sync, container, false);
         session = new SessionManager(getActivity());
-//        btnSyncDownInventory03T = view.findViewById(R.id.btnSyncDownInventory03T);
-//        btnSyncUpInventory03T = view.findViewById(R.id.btnSyncUpInventory03T);
-//        btnRefreshInventory03T = view.findViewById(R.id.btnRefreshInventory03T);
-//        btnSyncDownPgroupT = view.findViewById(R.id.btnSyncDownPgroupT);
-//        btnSyncDownPriceT = view.findViewById(R.id.btnSyncDownPriceT);
-//        btnRefreshLMDInvValueT = view.findViewById(R.id.btnRefreshLMDIVT);
-//        btnUpdateLMDT = view.findViewById(R.id.btnUpdateLMDT);
-//        btnUploadLmdInvValT = view.findViewById(R.id.btnUploadLmdInvValueT);
-//        btnUploadReceiptT = view.findViewById(R.id.btnUploadReceiptT);
-//        btnUploadRestockT = view.findViewById(R.id.btnUploadRestockT);
-//        btnUploadTellerT = view.findViewById(R.id.btnUploadTellerT);
-//        btnUpdateHoldCostT = view.findViewById(R.id.btnUpdateHoldingCostT);
+
         btnUploadData = view.findViewById(R.id.btn_upload_data);
         btnDownloadData = view.findViewById(R.id.btn_download_data);
 
@@ -84,9 +73,6 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countDown[0]++;
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync6.execute(staff_id);
@@ -98,9 +84,6 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countDown[0]++;
                         }
-//                else {
-//                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                }
                     }
                 };
                 syncDown.execute(staff_id);
@@ -112,9 +95,6 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countDown[0]++;
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync2.execute(staff_id);
@@ -126,9 +106,6 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countDown[0]++;
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync3.execute();
@@ -140,12 +117,20 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countDown[0]++;
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync4.execute(staff_id);
+
+                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownLeadTimeT sync7 = new SyncModule.SyncDownLeadTimeT((getActivity()).getApplicationContext()) {
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Log.d("s", "" + s);
+                        if (s.trim().equalsIgnoreCase("done")) {
+                            countDown[0]++;
+                        }
+                    }
+                };
+                sync7.execute(staff_id);
 
                 @SuppressLint("StaticFieldLeak") updateLMDT sync5 = new SyncModule.updateLMDT((getActivity()).getApplicationContext()) {
                     @Override
@@ -154,11 +139,8 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countDown[0]++;
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                         Log.d("Countdown", "" + countDown[0]);
-                        if (countDown[0] == 6) {
+                        if (countDown[0] == 7) {
                             if (progressDialog.isShowing()) {
                                 progressDialog.dismiss();
                             }
@@ -170,8 +152,6 @@ public class TabFragmentSync extends Fragment {
                     }
                 };
                 sync5.execute(staff_id);
-
-
 
             }
         });
@@ -192,9 +172,6 @@ public class TabFragmentSync extends Fragment {
                             countUp[0]++;
                             Log.d("countUp", String.valueOf(countUp[0]));
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 syncUp.execute();
@@ -207,9 +184,6 @@ public class TabFragmentSync extends Fragment {
                             countUp[0]++;
                             Log.d("countUp", String.valueOf(countUp[0]));
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync.execute();
@@ -222,9 +196,6 @@ public class TabFragmentSync extends Fragment {
                             countUp[0]++;
                             Log.d("countUp", String.valueOf(countUp[0]));
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync1.execute();
@@ -237,9 +208,6 @@ public class TabFragmentSync extends Fragment {
                             countUp[0]++;
                             Log.d("countUp", String.valueOf(countUp[0]));
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
                     }
                 };
                 sync2.execute();
@@ -252,9 +220,6 @@ public class TabFragmentSync extends Fragment {
                             countUp[0]++;
                             Log.d("countUp", String.valueOf(countUp[0]));
                         }
-//                        else {
-//                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), s, Toast.LENGTH_SHORT).show();
-//                        }
 
                         Log.d("CountUp", "" + countUp[0]);
                         if (countUp[0] == 5) {
@@ -276,7 +241,6 @@ public class TabFragmentSync extends Fragment {
 
         return view;
     }
-
 
     public void CheckInternetPermission() {
         try {

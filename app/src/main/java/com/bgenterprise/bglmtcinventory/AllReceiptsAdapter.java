@@ -30,7 +30,6 @@ public class AllReceiptsAdapter extends RecyclerView.Adapter<AllReceiptsAdapter.
         this.listener = listener;
     }
 
-
     @Override
     public AllReceiptsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View AllReceiptView = LayoutInflater.from(parent.getContext()).inflate(R.layout.receipts_row, parent, false);
@@ -54,8 +53,9 @@ public class AllReceiptsAdapter extends RecyclerView.Adapter<AllReceiptsAdapter.
 
 
     @Override
-    public int getItemCount() { return mFilteredList.size(); }
-
+    public int getItemCount() {
+        return mFilteredList.size();
+    }
 
 
     @Override

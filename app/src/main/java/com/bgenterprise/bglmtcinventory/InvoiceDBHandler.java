@@ -1,5 +1,6 @@
 package com.bgenterprise.bglmtcinventory;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LMDInvoiceValueT;
+import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LeadTimeT;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceGroupT;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
@@ -151,7 +153,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         Cursor c = db.rawQuery("SELECT SUM(InvoiceQty) FROM LMDInvoiceValueT WHERE LMDID = '" + LMDid + "' AND ItemID = '" + item_id + "'", null);
         c.moveToFirst();
 
-        totalInvoices = c.getInt(c.getColumnIndex("SUM(InvoiceValue)"));
+        totalInvoices = c.getInt(0);
 
         c.close();
         db.close();
@@ -336,6 +338,59 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         return lastCount;
     }
 
+    int getTotalIdQty(String lmdID, String itemID) {
+        int totalIDQty = 0;
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("SELECT SUM(" + LMDInvoiceValueT.COLUMN_INPUT_DIST_QTY + ") FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE " +
+                    LMDInvoiceValueT.COLUMN_LMD_ID + "='" + lmdID + "' AND " + LMDInvoiceValueT.COLUMN_ITEM_ID + "='" + itemID + "' ", null);
+            cursor.moveToFirst();
+            totalIDQty = cursor.getInt(0);
+            cursor.close();
+        } catch (Exception e) {
+            Log.d("Except", "" + e);
+        }
+
+        db.close();
+        return totalIDQty;
+    }
+
+    int getTotalIdQtyForRestock(String lmdID, String itemID) {
+        int totalIDQty = 0;
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("SELECT SUM(" + LMDInvoiceValueT.COLUMN_INPUT_DIST_QTY + ") FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE " +
+                    LMDInvoiceValueT.COLUMN_LMD_ID + "='" + lmdID + "' AND " + LMDInvoiceValueT.COLUMN_ITEM_ID + "='" + itemID + "' AND " +
+                    LMDInvoiceValueT.COLUMN_TXN_DATE + " < CURDATE()", null);
+            cursor.moveToFirst();
+            totalIDQty = cursor.getInt(0);
+            cursor.close();
+        } catch (Exception e) {
+            Log.d("Except", "" + e);
+        }
+
+        db.close();
+        return totalIDQty;
+    }
+
+    int getLeadTime(String lmdID, String itemID) {
+        int leadTime = 5;
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("SELECT " + LeadTimeT.COLUMN_LEAD_TIME + " FROM " + LeadTimeT.TABLE_NAME + " WHERE " + LeadTimeT.COLUMN_LMD_ID +
+                    "=" + lmdID + " AND " + LeadTimeT.COLUMN_ITEM_ID + "=" + itemID, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                leadTime = Integer.valueOf(cursor.getString(0));
+                cursor.moveToNext();
+            }
+        } catch (Exception e) {
+            Log.d("getleadtimeExcep", "" + e);
+        }
+
+        return leadTime;
+    }
+
     HashMap<String, String> getInvoiceDetails(String LMDID, String TxnDate, String ItemID) {
         HashMap<String, String> invoiceDetails = null;
         SQLiteDatabase db = getWritableDatabase();
@@ -472,6 +527,47 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                     contentValues.put(LMDInvoiceValueT.COLUMN_STAFF_ID, jsonObject.getString("Staff_ID"));
 
                     db.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void updateLeadTimeT(JSONArray jsonArray) {
+        SQLiteDatabase db = getWritableDatabase();
+        JSONObject jsonObject;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                int check = 0;
+                Cursor cursor = db.rawQuery("SELECT COUNT(" + LeadTimeT.COLUMN_LMD_ID + ") FROM " + LeadTimeT.TABLE_NAME + " WHERE " +
+                        LeadTimeT.COLUMN_LMD_ID + " =\"" + jsonObject.get("LmdID") + "\" AND " + LeadTimeT.COLUMN_ITEM_ID + "=\"" +
+                        jsonObject.getString("ItemID") + "\"", null);
+                cursor.moveToFirst();
+                if (!cursor.isAfterLast()) {
+                    check = cursor.getInt(0);
+                }
+                cursor.close();
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat format_ = new SimpleDateFormat("yyyy-MM-dd");
+                Date today = new Date();
+                String today_str = format_.format(today);
+                ContentValues contentValues = new ContentValues();
+                if (check == 0) {
+                    contentValues.put(LeadTimeT.COLUMN_LMD_ID, jsonObject.getString("LmdID"));
+                    contentValues.put(LeadTimeT.COLUMN_LEAD_TIME, jsonObject.getString("LeadTime"));
+                    contentValues.put(LeadTimeT.COLUMN_SYNC_DATE, today_str);
+                    contentValues.put(LeadTimeT.COLUMN_ITEM_ID, jsonObject.getString("ItemID"));
+
+                    db.insert(LeadTimeT.TABLE_NAME, null, contentValues);
+                } else {
+                    contentValues.put(LeadTimeT.COLUMN_LEAD_TIME, jsonObject.getString("LeadTime"));
+                    contentValues.put(LeadTimeT.COLUMN_SYNC_DATE, today_str);
+                    String where = LeadTimeT.COLUMN_LMD_ID + " =? AND " + LeadTimeT.COLUMN_ITEM_ID + " =?";
+                    String[] whereArgs = new String[]{String.valueOf(jsonObject.getString("LmdID")), String.valueOf(jsonObject.getString("ItemID"))};
+
+                    db.update(LeadTimeT.TABLE_NAME, contentValues, where, whereArgs);
                 }
 
             } catch (JSONException e) {
