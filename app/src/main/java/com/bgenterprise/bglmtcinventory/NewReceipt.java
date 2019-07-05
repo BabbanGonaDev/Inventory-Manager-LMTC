@@ -191,7 +191,7 @@ public class NewReceipt extends AppCompatActivity {
         }else{
             new AlertDialog.Builder(NewReceipt.this)
                     .setTitle("Confirm Receipt Entry")
-                    .setMessage("Are you sure you want to enter this receipt ?")
+                    .setMessage("Are you sure you want to enter this receipt of NGN " + etAmount1.getText().toString() + " from " + tvLMDName.getText().toString() +" ?")
                     .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

@@ -26,7 +26,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     private ZXingScannerView scanner;
     SharedPreferences QRPrefs;
     SessionManager session;
-
+    InvoiceDBHandler invoicedb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         scanner = new ZXingScannerView(this);
         setContentView(scanner);
         QRPrefs = getSharedPreferences("QRPreferences", MODE_PRIVATE);
+        invoicedb = new InvoiceDBHandler(ScannerActivity.this);
         session = new SessionManager(ScannerActivity.this);
         setTitle(QRPrefs.getString("scanner_title", ""));
     }
@@ -60,15 +61,14 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         switch (Objects.requireNonNull(QRPrefs.getString("required", ""))) {
             case "LMD_Receipt":
                 try {
-
                     if ((data[1].charAt(0) != 'R') || (data[1].charAt(16) != '9')) {
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
-                    }
-
+                    }else{
                         Log.d("LMD_Receipt", data[0]+" "+data[1]+" "+data[2]);
                         session.CREATE_LMD_SESSION(data[0], data[1], data[2]);
                         startActivity(new Intent(ScannerActivity.this, NewReceipt.class));
+                    }
 
                 } catch (ArrayIndexOutOfBoundsException exception) {
                     Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
@@ -86,31 +86,30 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                     startActivity(new Intent(ScannerActivity.this, NewReceipt.class));
 
                 } catch (ArrayIndexOutOfBoundsException exception) {
-                    Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan the appropriate Receipt QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 } catch (StringIndexOutOfBoundsException e) {
-                    Toast.makeText(getApplicationContext(), "Please scan an appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan an appropriate Receipt QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 }
                 break;
 
             case "TeamMember_Receipt":
                 try {
-
                     if (data[1].charAt(0) != 'T') {
                         Toast.makeText(getApplicationContext(), "Please scan a BG Team Member's QR code to proceed", Toast.LENGTH_LONG).show();
                         finish();
+                    }else{
+                        Log.d("FOD_Receipt", data[0]);
+                        session.CREATE_TEAM_MEMBER_SESSION(data[0], data[1]);
+                        startActivity(new Intent(ScannerActivity.this, NewReceipt.class));
                     }
 
-                    Log.d("FOD_Receipt", data[0]);
-                    session.CREATE_TEAM_MEMBER_SESSION(data[0], data[1]);
-                    startActivity(new Intent(ScannerActivity.this, NewReceipt.class));
-
                 } catch (ArrayIndexOutOfBoundsException exception) {
-                    Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan the appropriate Team member QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 } catch (StringIndexOutOfBoundsException e) {
-                    Toast.makeText(getApplicationContext(), "Please scan an appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan an appropriate Team Member QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 }
                 break;
@@ -121,11 +120,21 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                     if ((data[1].charAt(0) != 'R') || (data[1].charAt(16) != '9')) {
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
+                    }else if(!invoicedb.isLMDinPriceGroup(data[1])){
+                        new AlertDialog.Builder(this)
+                                .setTitle("Unknown Price Group")
+                                .setMessage(data[0] + " was not found in any price group")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        startActivity(new Intent(ScannerActivity.this, Operations.class));
+                                    }
+                                }).show();
+                    }else{
+                        Log.d("LMD_Count", data[0]+" "+data[1]+" "+data[2]);
+                        session.CREATE_LMD_SESSION(data[0], data[1], data[2]);
+                        startActivity(new Intent(ScannerActivity.this, StockCount.class));
                     }
-
-                    Log.d("LMD_Count", data[0]+" "+data[1]+" "+data[2]);
-                    session.CREATE_LMD_SESSION(data[0], data[1], data[2]);
-                    startActivity(new Intent(ScannerActivity.this, StockCount.class));
 
                 } catch (ArrayIndexOutOfBoundsException exception) {
                     Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
@@ -143,17 +152,17 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                         Log.d("data[1]", "" + data[1]);
                         Toast.makeText(getApplicationContext(), "Please scan a BG product QR code to proceed", Toast.LENGTH_LONG).show();
                         finish();
+                    }else{
+                        Log.d("Product_Count", data[0]+" "+data[1]);
+                        session.CREATE_PRODUCT_SESSION(data[0], data[1]);
+                        startActivity(new Intent(ScannerActivity.this, StockCount.class));
                     }
 
-                    Log.d("Product_Count", data[0]+" "+data[1]);
-                    session.CREATE_PRODUCT_SESSION(data[0], data[1]);
-                    startActivity(new Intent(ScannerActivity.this, StockCount.class));
-
                 }catch (ArrayIndexOutOfBoundsException exception) {
-                    Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan the appropriate Product QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 } catch (StringIndexOutOfBoundsException e) {
-                    Toast.makeText(getApplicationContext(), "Please scan an appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan an appropriate Product QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 }
                 break;
@@ -186,25 +195,24 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                     }
 
                 }catch (ArrayIndexOutOfBoundsException exception) {
-                    Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan the appropriate Receipt QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 } catch (StringIndexOutOfBoundsException e) {
-                    Toast.makeText(getApplicationContext(), "Please scan an appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please scan an appropriate Receipt QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
                 }
                 break;
 
             case "LMD_Receivable":
                 try {
-
                     if ((data[1].charAt(0) != 'R') || (data[1].charAt(16) != '9')) {
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
+                    }else{
+                        Log.d("LMD_Receipt", data[0]+" "+data[1]+" "+data[2]);
+                        session.CREATE_LMD_SESSION(data[0], data[1], data[2]);
+                        startActivity(new Intent(ScannerActivity.this, View_Receivable.class));
                     }
-
-                    Log.d("LMD_Receipt", data[0]+" "+data[1]+" "+data[2]);
-                    session.CREATE_LMD_SESSION(data[0], data[1], data[2]);
-                    startActivity(new Intent(ScannerActivity.this, View_Receivable.class));
 
                 } catch (ArrayIndexOutOfBoundsException exception) {
                     Toast.makeText(getApplicationContext(), "Please scan the appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
@@ -221,5 +229,9 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         }
 
         QRPrefs.edit().putString("scanner_title", "").commit();
+    }
+
+    public void CheckLMDPG(String lmdid, String lmdname){
+
     }
 }

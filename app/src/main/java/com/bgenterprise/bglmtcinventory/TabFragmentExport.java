@@ -1,9 +1,13 @@
 package com.bgenterprise.bglmtcinventory;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +33,11 @@ public class TabFragmentExport extends Fragment {
         view = inflater.inflate(R.layout.fragment_tab_fragment_export, container, false);
         exportAllDB = view.findViewById(R.id.btn_exp_DB);
 
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 21);
+
+        }
+
         exportAllDB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,7 +49,7 @@ public class TabFragmentExport extends Fragment {
                 SQLiteToExcel sqliteToExcel;
                 final int[] count = {0};
 
-                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "inventory.db", directory_path + "/Exports");
+                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "inventory.db", directory_path + "/LMTCExports");
                 try {
                     sqliteToExcel.exportAllTables("inventoryDB.xls", new SQLiteToExcel.ExportListener() {
                         @Override
@@ -51,6 +60,7 @@ public class TabFragmentExport extends Fragment {
                         public void onCompleted(String filePath) {
                             count[0]++;
                             Log.d("count", "" + count[0]);
+                            Toast.makeText(getActivity().getApplicationContext(), "Inventory DB Exported", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -64,7 +74,7 @@ public class TabFragmentExport extends Fragment {
                 }
 
 
-                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "invoices.db", directory_path + "/Exports");
+                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "invoices.db", directory_path + "/LMTCExports");
                 sqliteToExcel.exportAllTables("invoicesDB.xls", new SQLiteToExcel.ExportListener() {
                     @Override
                     public void onStart() {
@@ -74,6 +84,7 @@ public class TabFragmentExport extends Fragment {
                     public void onCompleted(String filePath) {
                         count[0]++;
                         Log.d("count", "" + count[0]);
+                        Toast.makeText(getActivity().getApplicationContext(), "Invoice DB Exported", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -82,7 +93,7 @@ public class TabFragmentExport extends Fragment {
                     }
                 }, getActivity().getApplicationContext());
 
-                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "lmd.db", directory_path + "/Exports");
+                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "lmd.db", directory_path + "/LMTCExports");
                 try {
                     sqliteToExcel.exportAllTables("LmdDB.xls", new SQLiteToExcel.ExportListener() {
                         @Override
@@ -93,6 +104,7 @@ public class TabFragmentExport extends Fragment {
                         public void onCompleted(String filePath) {
                             count[0]++;
                             Log.d("count", "" + count[0]);
+                            Toast.makeText(getActivity().getApplicationContext(), "LMD DB Exported", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -106,7 +118,7 @@ public class TabFragmentExport extends Fragment {
                 }
 
 
-                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "receipts.db", directory_path + "/Exports");
+                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "receipts.db", directory_path + "/LMTCExports");
                 try {
                     sqliteToExcel.exportAllTables("receiptsDB.xls", new SQLiteToExcel.ExportListener() {
                         @Override
@@ -117,6 +129,7 @@ public class TabFragmentExport extends Fragment {
                         public void onCompleted(String filePath) {
                             count[0]++;
                             Log.d("count", "" + count[0]);
+                            Toast.makeText(getActivity().getApplicationContext(), "Receipts DB Exported", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -130,7 +143,7 @@ public class TabFragmentExport extends Fragment {
                 }
 
 
-                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "restocks.db", directory_path + "/Exports");
+                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "restocks.db", directory_path + "/LMTCExports");
                 try {
                     sqliteToExcel.exportAllTables("restocksDB.xls", new SQLiteToExcel.ExportListener() {
                         @Override
@@ -141,6 +154,7 @@ public class TabFragmentExport extends Fragment {
                         public void onCompleted(String filePath) {
                             count[0]++;
                             Log.d("count", "" + count[0]);
+                            Toast.makeText(getActivity().getApplicationContext(), "Restocks DB Exported", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -154,7 +168,7 @@ public class TabFragmentExport extends Fragment {
                 }
 
 
-                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "tellers.db", directory_path + "/Exports");
+                sqliteToExcel = new SQLiteToExcel(getActivity().getApplicationContext(), "tellers.db", directory_path + "/LMTCExports");
                 try {
                     sqliteToExcel.exportAllTables("tellersDB.xls", new SQLiteToExcel.ExportListener() {
                         @Override
@@ -165,7 +179,7 @@ public class TabFragmentExport extends Fragment {
                         public void onCompleted(String filePath) {
                             count[0]++;
                             Log.d("count", "final" + count[0]);
-                            Toast.makeText(getActivity().getApplicationContext(), "Exported Successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Tellers DB Exported", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override

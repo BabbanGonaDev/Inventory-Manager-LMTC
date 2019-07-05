@@ -48,6 +48,7 @@ public class ReportsPage extends AppCompatActivity {
                 Log.d("CHECK", "Onclick pass to View_reports.");
                 Intent intent = new Intent(ReportsPage.this, View_Reports.class);
                 intent.putExtra("LMDID", lmd.getLMDID());
+                intent.putExtra("LMDNAME", lmd.getLMDName());
                 startActivity(intent);
             }
         });

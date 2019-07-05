@@ -7,6 +7,7 @@ package com.bgenterprise.bglmtcinventory;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class Operations extends AppCompatActivity
@@ -38,6 +40,15 @@ public class Operations extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        File dir = new File(Environment.getExternalStorageDirectory().getPath(), "LMTCExports");
+        try {
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Fragment beginFragment = new FragmentWelcome();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frameForButtons, beginFragment);
@@ -48,6 +59,9 @@ public class Operations extends AppCompatActivity
 
         }else if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(Operations.this, new String[]{Manifest.permission.INTERNET}, 23);
+        }else if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(Operations.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 31);
+
         }
 
 

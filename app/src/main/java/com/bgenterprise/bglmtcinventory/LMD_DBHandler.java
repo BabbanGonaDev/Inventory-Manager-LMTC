@@ -19,12 +19,12 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "lmd.db";
     private static final int DATABASE_VERSION = 1;
-    Context context;
+    //Context context;
 
 
     public LMD_DBHandler(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
+        //this.context = context;
     }
 
     @Override
@@ -48,6 +48,34 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
     }
 
     void updateLMDT(JSONArray jsonArray) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        //Truncate the table here before beginning insertion.
+        //This works because we are sending the entire json array to the function.
+
+        String TruncQ = "DELETE FROM " + LMDT.TABLE_NAME;
+        db.execSQL(TruncQ);
+        JSONObject jsonObject;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            try {
+                jsonObject = jsonArray.getJSONObject(i);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(LMDT.COLUMN_LMD_ID, jsonObject.getString("LMD_ID"));
+                contentValues.put(LMDT.COLUMN_LMD_NAME, jsonObject.getString("LMD_Name"));
+                contentValues.put(LMDT.COLUMN_LMTC_ID, jsonObject.getString("LMTC_ID"));
+
+                db.insert(LMDT.TABLE_NAME, null, contentValues);
+                db.close();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    void updateLMDTold(JSONArray jsonArray) {
         SQLiteDatabase db = getWritableDatabase();
         JSONObject jsonObject;
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -79,11 +107,22 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
                     db.update(LMDT.TABLE_NAME, contentValues, where, whereArgs);
                 }
 
-
+                db.close();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
         }
+    }
+
+    public boolean isLMTCInDB(String lmtcid){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM LMDT WHERE LMTC_ID = '"+ lmtcid +"'", null);
+        if(cursor.getCount() < 1){
+            return false;
+        }
+        cursor.close();
+        db.close();
+        return true;
     }
 }

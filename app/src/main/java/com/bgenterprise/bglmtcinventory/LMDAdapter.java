@@ -49,7 +49,7 @@ public class LMDAdapter extends RecyclerView.Adapter<LMDAdapter.LMDViewHolder> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onClick(lmdList.get(getLayoutPosition()));
+                    listener.onClick(mFilteredList.get(getLayoutPosition()));
                 }
             });
         }

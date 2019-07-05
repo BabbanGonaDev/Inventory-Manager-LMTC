@@ -1,6 +1,7 @@
 package com.bgenterprise.bglmtcinventory;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -31,7 +32,8 @@ import java.util.Objects;
 
 public class SyncModule {
 
-    private static String InternetLink = "http://4ed841db.ngrok.io";
+    private static String InternetLink = "http://apps.babbangona.com";
+    //private static String InternetLink = "http://379f6a18.ngrok.io";
 
     public static class SyncDownInventory03T extends AsyncTask<String, String, String> {
         //This function syncs down the Inventory03T for the respective LMD.
@@ -67,7 +69,7 @@ public class SyncModule {
             wordList.add(map);
 
             try {
-                URL url = new URL(InternetLink + "/inventory/lmtc_fetch_inventory03t.php");
+                URL url = new URL(InternetLink + "/qrcode/lmtc_fetch_inventory03t.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -100,8 +102,9 @@ public class SyncModule {
                     Log.d("result", String.valueOf(result));
                     try {
                         JSONArray arr = new JSONArray(result + "");
-                        Log.d("result", arr + "");
+                        Log.d("resultinventory03t", arr + "");
                         inventoryDBHandler.updateInventory03T(arr);
+                        Log.d("updatedInventory03t","yes");
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -122,6 +125,77 @@ public class SyncModule {
         }
     }
 
+    public static class RefreshInventory03T extends AsyncTask<String, String, String>{
+        //This function re-downloads every single thing into the LMTC app.
+        @SuppressLint("StaticFieldLeak")
+        private Context mCtx;
+        InventoryDBHandler inventoryDBHandler;
+
+        RefreshInventory03T(Context context){
+            this.mCtx = context;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            inventoryDBHandler = new InventoryDBHandler(mCtx);
+            SessionManager session = new SessionManager(mCtx);
+            HashMap<String,String> val = session.getAllDetails();
+            String staff_ID = val.get(SessionManager.KEY_STAFF_ID);
+             HttpURLConnection httpURLConnection = null;
+            try{
+                URL url = new URL(InternetLink + "/qrcode/lmtc_refresh_inventory03t.php");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+                String data_string = URLEncoder.encode("staff_id", "UTF-8") + "=" + URLEncoder.encode(staff_ID, "UTF-8");
+                Log.d("data_string", "" + data_string);
+                bufferedWriter.write(data_string);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                httpURLConnection.connect();
+            }catch(MalformedURLException e){
+                e.printStackTrace();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
+            try{
+                int response_code = httpURLConnection.getResponseCode();
+                if(response_code == HttpURLConnection.HTTP_OK){
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                        StringBuilder result = new StringBuilder();
+                        String line;
+                        while((line = bufferedReader.readLine()) != null){
+                            result.append(line);
+                        }
+                        Log.d("result", String.valueOf(result));
+                        try{
+                            JSONArray arr = new JSONArray(result + "");
+                            Log.d("resultInv03t-refresh", arr + "");
+                            inventoryDBHandler.ReplaceInventory03T(arr);
+                            return "done";
+                        }catch(JSONException e){
+                            e.printStackTrace();
+                            return "Operation failed, JSON Exception";
+                    }
+                }else{
+                    return "Sync failed due to an internal error.";
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+                return "Refresh failed due to internal error.";
+            } finally {
+                if(httpURLConnection != null){
+                    httpURLConnection.disconnect();
+                }
+            }
+        }
+    }
+
     public static class SyncUpInventory03T extends AsyncTask<String, String, String> {
 
         @SuppressLint("StaticFieldLeak")
@@ -139,32 +213,34 @@ public class SyncModule {
             inventoryDBHandler = new InventoryDBHandler(context);
             wordList = inventoryDBHandler.getInventory03TRecords();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "done";
+
+            if (wordList.size() < 1) return "No records to sync in Inventory03T.";
+
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
 
             try {
-//                initialize URL
-                URL url = new URL(InternetLink + "/inventory/lmtc_insert_inventory03t.php");
+                //initialize URL
+                URL url = new URL(InternetLink + "/qrcode/lmtc_insert_inventory03t.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
-//                set request method as 'POST'
+                //set request method as 'POST'
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
-//                initialize output stream
+                //initialize output stream
                 OutputStream outputStream = httpURLConnection.getOutputStream();
-//                initialize buffered writer to write to online DB
+                //initialize buffered writer to write to online DB
                 BufferedWriter bufferedWriter;
                 bufferedWriter = new BufferedWriter
                         (new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
                 String data_string;
-//                encode upload information to UTF-8 standard character set format
+                //encode upload information to UTF-8 standard character set format
                 data_string = URLEncoder.encode("wordList", "UTF-8") + "=" + URLEncoder.encode(word_list, "UTF-8");
                 bufferedWriter.write(data_string);
-//                flush the buffer
+                //flush the buffer
                 bufferedWriter.flush();
-//                close the buffer
+                //close the buffer
                 bufferedWriter.close();
 //                close the output stream
                 outputStream.close();
@@ -203,7 +279,7 @@ public class SyncModule {
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        return "All records have been Synced";
+                        return "Error Updating Inventory03T Sync Status";
                     }
                 } else {
                     return ("Sync failed due to a network error.");
@@ -237,9 +313,9 @@ public class SyncModule {
             HttpURLConnection httpURLConnection = null;
             Gson gson = new GsonBuilder().create();
             String staffID = gson.toJson(staff_id);
-            Log.d("staffID", "" + staffID);
+            Log.d("staffID", "The Staff id being passed " + staffID);
             try {
-                URL url = new URL(InternetLink + "/inventory/priceGroupT_syncDown");
+                URL url = new URL(InternetLink + "/qrcode/priceGroupT_syncDown.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -271,8 +347,10 @@ public class SyncModule {
 
                     try {
                         JSONArray arr = new JSONArray(result + "");
-                        Log.d("result", arr + "");
+                        Log.d("resultPGtbefore", result.toString());
+                        Log.d("resultPGt", arr + "");
                         invoiceDBHandler.updatePriceGroupT(arr);
+                        Log.d("updatedPGt","yes");
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -312,7 +390,7 @@ public class SyncModule {
             String staffID = gson.toJson(staff_id);
 
             try {
-                URL url = new URL(InternetLink + "/inventory/priceT_SyncDown.php");
+                URL url = new URL(InternetLink + "/qrcode/PriceT_SyncDown.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -344,8 +422,9 @@ public class SyncModule {
                     Log.d("result", String.valueOf(result));
                     try {
                         JSONArray arr = new JSONArray(result + "");
-                        Log.d("result", arr + "");
+                        Log.d("resultPriceT", arr + "");
                         invoiceDBHandler.updatePriceT(arr);
+                        Log.d("updatedPriceT","y");
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -382,7 +461,7 @@ public class SyncModule {
             HttpURLConnection httpURLConnection = null;
 
             try {
-                URL url = new URL(InternetLink + "/inventory/SyncDownHoldingCostT.php");
+                URL url = new URL(InternetLink + "/qrcode/SyncDownHoldingCostT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -407,8 +486,9 @@ public class SyncModule {
                     Log.d("result", String.valueOf(result));
                     try {
                         JSONArray arr = new JSONArray(result + "");
-                        Log.d("result", arr + "");
+                        Log.d("resultHCt", arr + "");
                         inventoryDBHandler.updateHoldingCostT(arr);
+                        Log.d("updatedHCT","y");
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -447,7 +527,7 @@ public class SyncModule {
             String staffID = gson.toJson(staff_id);
 
             try {
-                URL url = new URL(InternetLink + "/inventory/RefreshLMDInvoiceValueT.php");
+                URL url = new URL(InternetLink + "/qrcode/RefreshLMDInvoiceValueT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -521,7 +601,7 @@ public class SyncModule {
             String staffID = gson.toJson(staff_id);
 
             try {
-                URL url = new URL(InternetLink + "/inventory/SyncDownLeadTimeT.php");
+                URL url = new URL(InternetLink + "/qrcode/SyncDownLeadTimeT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -596,7 +676,7 @@ public class SyncModule {
             String staffID = gson.toJson(staff_id);
 
             try {
-                URL url = new URL(InternetLink + "/inventory/updateLMDT.php");
+                URL url = new URL(InternetLink + "/qrcode/updateLMDT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoInput(true);
@@ -665,14 +745,14 @@ public class SyncModule {
             invoiceDBHandler = new InvoiceDBHandler(ctx);
             wordList = invoiceDBHandler.uploadLMDInvValueT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "done";
+            if (wordList.size() < 1) return "No LMDInvoiceValueT Records to sync";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
 
             try {
 //                initialize URL
-                URL url = new URL(InternetLink + "/inventory/SyncUpLMDInvValueT");
+                URL url = new URL(InternetLink + "/qrcode/SyncUpLMDInvValueT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 //                set request method as 'POST'
                 httpURLConnection.setRequestMethod("POST");
@@ -705,8 +785,8 @@ public class SyncModule {
             }
 
             try {
-//                get URL connection reponse code
-                int response_code = Objects.requireNonNull(httpURLConnection).getResponseCode();
+//                get URL connection response code
+                int response_code = httpURLConnection.getResponseCode();
 //                do this is code denotes a positive connection
                 if (response_code == HttpURLConnection.HTTP_OK) {
 //                    initialize input stream
@@ -729,7 +809,8 @@ public class SyncModule {
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        return "All records have been Synced";
+                        return "JSON Exception LMD Invoice ValueT";
+
                     }
                 } else {
                     return ("Sync failed due to a network error.");
@@ -737,7 +818,9 @@ public class SyncModule {
             } catch (IOException e) {
                 e.printStackTrace();
                 return "Sync failed due to internal error. Most likely a network error";
-            } finally {
+            }
+
+            finally {
                 if (httpURLConnection != null) {
                     httpURLConnection.disconnect();
                 }
@@ -761,14 +844,14 @@ public class SyncModule {
             receiptDBHandler = new ReceiptDBHandler(ctx);
             wordList = receiptDBHandler.uploadReceiptT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "done";
+            if (wordList.size() < 1) return "No Records in Receipt Table";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
 
             try {
 //                initialize URL
-                URL url = new URL(InternetLink + "/inventory/SyncUpReceiptTable");
+                URL url = new URL(InternetLink + "/qrcode/SyncUpReceiptTable.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 //                set request method as 'POST'
                 httpURLConnection.setRequestMethod("POST");
@@ -825,7 +908,7 @@ public class SyncModule {
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        return "All records have been Synced";
+                        return "JSON Exception Sync up Receipt Table.";
                     }
                 } else {
                     return ("Sync failed due to a network error.");
@@ -857,14 +940,14 @@ public class SyncModule {
             restockDBHandler = new RestockDBHandler(ctx);
             wordList = restockDBHandler.uploadRestockT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "done";
+            if (wordList.size() < 1) return "No Records in RestockT";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
 
             try {
 //                initialize URL
-                URL url = new URL(InternetLink + "/inventory/SyncUpRestockT.php");
+                URL url = new URL(InternetLink + "/qrcode/SyncUpRestockT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 //                set request method as 'POST'
                 httpURLConnection.setRequestMethod("POST");
@@ -921,7 +1004,7 @@ public class SyncModule {
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        return "All records have been Synced";
+                        return "JSON Exception RestockT";
                     }
                 } else {
                     return ("Sync failed due to a network error.");
@@ -952,14 +1035,14 @@ public class SyncModule {
             tellerDBHandler = new TellerDBHandler(ctx);
             wordList = tellerDBHandler.uploadTellerT();
             Log.d("HERE", wordList + " " + wordList.size());
-            if (wordList.size() < 1) return "done";
+            if (wordList.size() < 1) return "No records to sync up TellerT";
             Gson gson = new GsonBuilder().create();
             String word_list = gson.toJson(wordList);
             HttpURLConnection httpURLConnection = null;
 
             try {
 //                initialize URL
-                URL url = new URL(InternetLink + "/inventory/SyncUpTellerT.php");
+                URL url = new URL(InternetLink + "/qrcode/SyncUpTellerT.php");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 //                set request method as 'POST'
                 httpURLConnection.setRequestMethod("POST");
@@ -1016,7 +1099,7 @@ public class SyncModule {
                         return "done";
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        return "All records have been Synced";
+                        return "JSON Exception SyncUp TellerT";
                     }
                 } else {
                     return ("Sync failed due to a network error.");
@@ -1031,6 +1114,8 @@ public class SyncModule {
             }
         }
     }
+
+
 
 
 }

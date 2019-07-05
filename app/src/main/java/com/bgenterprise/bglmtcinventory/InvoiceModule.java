@@ -158,9 +158,11 @@ public class InvoiceModule {
             Double count = Double.valueOf(prod_count);
             Log.d("CHECK", "Double value of count: " + myFormat.format(count));
 
-            Double idCount = (double) db.getTotalIdQty(lmdid, itemid);
+            InventoryDBHandler inventoryDBHandler = new InventoryDBHandler(context);
+            Double idCount = (double) inventoryDBHandler.getTotalIdQty(lmdid, itemid);
             Log.d("CHECK", "Double value of IDcount: " + myFormat.format(idCount));
 
+            //Hence InvQty = All deliveries - All invoice amounts - All ID out - current count = Amount that was sold.
             Double invoiceQty = delivery - invoice - idCount - count;
 
             Log.d("CHECK", "Final InvoiceQty: " + myFormat.format(invoiceQty));
@@ -179,7 +181,8 @@ public class InvoiceModule {
 
             Double count = Double.valueOf(prod_count);
 
-            Double idCount = (double) db.getTotalIdQtyForRestock(lmdid, itemid);
+            InventoryDBHandler inventoryDBHandler = new InventoryDBHandler(context);
+            Double idCount = (double) inventoryDBHandler.getTotalIdQtyForRestock(lmdid, itemid);
             Log.d("CHECK", "Double value of IDcountForRestock: " + myFormat.format(idCount));
 
             Double invoiceQty = delivery - invoice - idCount - count;

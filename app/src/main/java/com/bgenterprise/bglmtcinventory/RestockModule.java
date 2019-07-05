@@ -64,10 +64,11 @@ public class RestockModule {
             //This function calculates the sales rate by dividing the invoice value by the number of days.
 
             long dateDiff = GetLastInvDateDifference();
-            if (dateDiff == 0) {
+            if (dateDiff <= 0) {
                 dateDiff = 1;
             }
             double salesRate;
+            //TODO -> Add ID out rate here too. (InvoiceValue + ID out) all between that period.
             salesRate = invoiceValue / dateDiff;
             Log.d("CHECK SalesRate", "" + salesRate);
 

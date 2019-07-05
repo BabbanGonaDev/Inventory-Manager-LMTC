@@ -21,22 +21,46 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/rounded_border"
-                android:text="Upload Data"
-                android:textAllCaps="true"
-                android:textColor="@color/text_color_white"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:text="Upload Application Data"
+                android:textAllCaps="false"
+                android:textColor="@color/text_color_white" />
 
             <Button
                 android:id="@+id/btn_download_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/rounded_border"
-                android:text="Download Data"
-                android:textAllCaps="true"
-                android:textColor="@color/text_color_white"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:text="Download Application Data"
+                android:textAllCaps="false"
+                android:textColor="@color/text_color_white" />
+
+            <Button
+                android:id="@+id/btn_refresh_invoiceT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_border"
+                android:padding="10dp"
+                android:text="Rebuild LMDInvoice Database"
+                android:textAllCaps="false"
+                android:textColor="@color/text_color_white" />
+
+            <Button
+                android:id="@+id/btn_refresh_inventory03T"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_border"
+                android:padding="10dp"
+                android:text="Rebuild Inventory03T Database"
+                android:textAllCaps="false"
+                android:textColor="@color/text_color_white" />
 
 
             <!--<Button-->

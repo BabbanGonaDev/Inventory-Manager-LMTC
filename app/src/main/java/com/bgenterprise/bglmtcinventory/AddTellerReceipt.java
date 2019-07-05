@@ -111,40 +111,53 @@ public class AddTellerReceipt extends AppCompatActivity {
                 et_receipt_amount1.getText().toString().equals(et_receipt_amount2.getText().toString())
                 ){
             Log.d("HERE", "onclick reached");
-            Date now = new Date();
-            String now_string = String.valueOf(now);
-            String uniqueID = SessionManager.KEY_STAFF_ID + "_" + now_string + "_T";
 
-            //Insert into the Teller Table.
-            if(tellerDBHandler.onAdd(allDetails.get(SessionManager.KEY_TELLER_ID), allDetails.get(SessionManager.KEY_TELLER_AMOUNT), allDetails.get(SessionManager.KEY_TELLER_BANK),
-                    tv_receipt_id.getText().toString(), et_receipt_amount2.getText().toString(), allDetails.get(SessionManager.KEY_TELLER_DATE),
-                    "no", allDetails.get(SessionManager.KEY_APP_VERSION), allDetails.get(SessionManager.KEY_STAFF_ID), uniqueID)) {
+            final String UniqueIDForTeller = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis()) + "_TELLER";
 
-                Toast.makeText(AddTellerReceipt.this, "Receipt " + tv_receipt_id.getText().toString() + " added successfully.", Toast.LENGTH_LONG).show();
-                new AlertDialog.Builder(AddTellerReceipt.this)
-                        .setTitle("Confirm Action")
-                        .setMessage("Do you still want to enter another receipt for this Teller ?")
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                session.CLEAR_TELLER_RECEIPT_DETAILS();
-                                et_receipt_amount1.setText("");
-                                et_receipt_amount2.setText("");
-//                                Intent intent = getIntent();
-//                                finish();
-//                                startActivity(intent);
-                                recreate();
+            //Add the dialog display here to confirm the amount entered.
+            new AlertDialog.Builder(AddTellerReceipt.this)
+                    .setTitle("Confirm Receipt Details")
+                    .setMessage("Are you sure you want to add Receipt: " + tv_receipt_id.getText().toString() + " of " + et_receipt_amount1.getText().toString() + "to this teller ?")
+                    .setPositiveButton("Yes I do", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            //Insert into the Teller Table.
+                            if(tellerDBHandler.onAdd(allDetails.get(SessionManager.KEY_TELLER_ID), allDetails.get(SessionManager.KEY_TELLER_AMOUNT), allDetails.get(SessionManager.KEY_TELLER_BANK),
+                                    tv_receipt_id.getText().toString(), et_receipt_amount2.getText().toString(), allDetails.get(SessionManager.KEY_TELLER_DATE),
+                                    "no", allDetails.get(SessionManager.KEY_APP_VERSION), allDetails.get(SessionManager.KEY_STAFF_ID), UniqueIDForTeller)) {
+
+                                Toast.makeText(AddTellerReceipt.this, "Receipt " + tv_receipt_id.getText().toString() + " added successfully.", Toast.LENGTH_LONG).show();
+                                new AlertDialog.Builder(AddTellerReceipt.this)
+                                        .setTitle("Confirm Action")
+                                        .setMessage("Do you still want to enter another receipt for this Teller ?")
+                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                session.CLEAR_TELLER_RECEIPT_DETAILS();
+                                                et_receipt_amount1.setText("");
+                                                et_receipt_amount2.setText("");
+                                                recreate();
+                                            }
+                                        })
+                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                session.CLEAR_TELLER_RECEIPT_DETAILS();
+                                                session.CLEAR_TELLER_DETAILS();
+                                                startActivity(new Intent(AddTellerReceipt.this, Operations.class));
+                                            }
+                                        }).show();
                             }
-                        })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                session.CLEAR_TELLER_RECEIPT_DETAILS();
-                                session.CLEAR_TELLER_DETAILS();
-                                startActivity(new Intent(AddTellerReceipt.this, Operations.class));
-                            }
-                        }).show();
-            }
+
+                        }
+                    })
+                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
 
         }else{
             Toast.makeText(AddTellerReceipt.this, "Kindly Check Details Again", Toast.LENGTH_LONG).show();

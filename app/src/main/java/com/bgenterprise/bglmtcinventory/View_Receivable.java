@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,7 +25,6 @@ public class View_Receivable extends AppCompatActivity {
     TextView tvLMDID, tvinvoice_value_today, tvcurrent_receivable, tvtotal_receivable;
     Double invoiceSum, receiptSum, latestInvoice, totalReceivable, currentReceivable;
     Button btnHome, btnMakePayment, btnViewInvoices;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,7 @@ public class View_Receivable extends AppCompatActivity {
 
             //Get the sum of receipts.
             receiptSum = receiptDB.getSumReceipts(LMD_ID);
+            Log.d("CHECK", "Receipt Sum: " + String.valueOf(receiptSum));
 
             //Invoice - Receipt = Receivable.
             totalReceivable = invoiceSum - receiptSum;
@@ -81,7 +82,7 @@ public class View_Receivable extends AppCompatActivity {
 
         tvLMDID.setText("LMD ID: " + LMD_ID + " Receivables.");
         tvinvoice_value_today.setText("Total Invoice Value till today: NGN " + myFormat.format(latestInvoice));
-        tvcurrent_receivable.setText("Current Receivable Amount till today: NGN " + myFormat.format(currentReceivable));
+        tvcurrent_receivable.setText("Previous Receivable Amount till today: NGN " + myFormat.format(currentReceivable));
         tvtotal_receivable.setText("Total Receivables Now: NGN " + myFormat.format(totalReceivable));
 
         btnHome.setOnClickListener(new View.OnClickListener() {
@@ -129,11 +130,6 @@ public class View_Receivable extends AppCompatActivity {
                     }
                 }).show();
     }
-
-    /*public void disputeInvoices(View view){
-
-
-    }*/
 
 
 }

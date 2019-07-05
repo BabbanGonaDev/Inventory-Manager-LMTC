@@ -97,12 +97,46 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
                     contentValues.put(Inventory03T.COLUMN_STAFF_ID, jsonObject.getString("Staff_ID"));
 
                     db.insert(Inventory03T.TABLE_NAME, null, contentValues);
+
+                }else if(check == 1){
+
+                    String UpdateQ = "UPDATE Inventory03T SET TxnDate = '" + jsonObject.getString("TxnDate") + "', LMDID = '" + jsonObject.getString("LMDID") + "', ItemID = '" + jsonObject.getString("ItemID") + "', Unit = '" + jsonObject.getString("Unit") +
+                            "' , Type = '" + jsonObject.getString("Type") + "', UnitPrice = '" + jsonObject.getString("UnitPrice") + "', Notes = '" + jsonObject.getString("Notes") + "', SyncDate = '" + jsonObject.getString("SyncDate") +
+                            "', SyncStatus = '" + jsonObject.getString("SyncStatus") + "', Staff_ID = '" + jsonObject.getString("Staff_ID") + "' WHERE UniqueID = '" + jsonObject.getString("UniqueID") + "'";
+
+                    Log.d("Inv03T Update", UpdateQ);
+                    db.execSQL(UpdateQ);
+
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        db.close();
 
+    }
+
+    void ReplaceInventory03T(JSONArray jsonArray){
+        SQLiteDatabase db = getWritableDatabase();
+
+        String clearQ = "DELETE FROM Inventory03T";
+        db.execSQL(clearQ);
+
+        JSONObject jsonObject;
+        for(int i = 0; i < jsonArray.length(); i++){
+            try{
+                jsonObject = jsonArray.getJSONObject(i);
+                String ReplaceQ = "REPLACE INTO Inventory03T (UniqueID, TxnDate, LMDID, ItemID, ItemName, Unit, Type, UnitPrice, Notes, SyncDate, SyncStatus, Staff_ID) VALUES " +
+                        "('"+ jsonObject.getString("UniqueID") + "','" + jsonObject.getString("TxnDate") + "','" + jsonObject.getString("LMDID") + "','" +
+                        jsonObject.getString("ItemID") + "','" + jsonObject.getString("ItemName") + "','" + jsonObject.getString("Unit") + "','" + jsonObject.getString("Type") +
+                        "','" + jsonObject.getString("UnitPrice") + "','" + jsonObject.getString("Notes") + "','" + jsonObject.getString("SyncDate") + "','yes','"+ jsonObject.getString("Staff_ID") +"')";
+                db.execSQL(ReplaceQ);
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
+        db.close();
     }
 
     Integer getNumberOf_FODEntries(String LMDid, String Itemid, String transDate) {
@@ -187,36 +221,79 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         return lastDate;
     }
 
+    int getTotalIdQty(String lmdID, String itemID) {
+        int totalIDQty = 0;
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("SELECT SUM(" + Inventory03T.COLUMN_UNIT + ") FROM " + Inventory03T.TABLE_NAME + " WHERE " +
+                    Inventory03T.COLUMN_LMD_ID + "='" + lmdID + "' AND " + Inventory03T.COLUMN_ITEM_ID + "='" + itemID + "' AND " +
+                    Inventory03T.COLUMN_TYPE+" = 'ID'", null);
+            cursor.moveToFirst();
+            totalIDQty = cursor.getInt(0);
+            cursor.close();
+        } catch (Exception e) {
+            Log.d("Except", "" + e);
+        }
+
+        db.close();
+        return totalIDQty;
+    }
+
+    int getTotalIdQtyForRestock(String lmdID, String itemID) {
+        int totalIDQty = 0;
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("SELECT SUM(" + Inventory03T.COLUMN_UNIT + ") FROM " + Inventory03T.TABLE_NAME + " WHERE " +
+                    Inventory03T.COLUMN_LMD_ID + "='" + lmdID + "' AND " + Inventory03T.COLUMN_ITEM_ID + "='" + itemID + "' AND " +
+                    Inventory03T.COLUMN_TXN_DATE + " < date('now') AND "+Inventory03T.COLUMN_TYPE+" = 'ID'", null);
+            cursor.moveToFirst();
+            totalIDQty = cursor.getInt(0);
+            cursor.close();
+        } catch (Exception e) {
+            Log.d("Except", "" + e);
+        }
+
+        db.close();
+        return totalIDQty;
+    }
+
     ArrayList<Map<String, String>> getInventory03TRecords() {
         Map<String, String> map;
         SQLiteDatabase db = getWritableDatabase();
         ArrayList<Map<String, String>> wordList;
         wordList = new ArrayList<>();
+        SessionManager sessionManager = new SessionManager(context);
+        HashMap<String, String> allDetails = sessionManager.getAllDetails();
 
         Log.d("CHECK", "Entered getInventory03TRecords");
 
-        String getQ = "SELECT * FROM " + Inventory03T.TABLE_NAME + " WHERE " + Inventory03T.COLUMN_SYNC_STATUS + " = 'no'";
-        Cursor cursor = db.rawQuery(getQ, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            map = new HashMap<>();
-            map.put("UniqueID", cursor.getString(cursor.getColumnIndex("UniqueID")));
-            map.put("TxnDate", cursor.getString(cursor.getColumnIndex("TxnDate")));
-            map.put("LMDID", cursor.getString(cursor.getColumnIndex("LMDID")));
-            map.put("ItemID", cursor.getString(cursor.getColumnIndex("ItemID")));
-            map.put("ItemName", cursor.getString(cursor.getColumnIndex("ItemName")));
-            map.put("Unit", cursor.getString(cursor.getColumnIndex("Unit")));
-            map.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
-            map.put("UnitPrice", cursor.getString(cursor.getColumnIndex("UnitPrice")));
-            map.put("Notes", cursor.getString(cursor.getColumnIndex("Notes")));
+        try{
+            String getQ = "SELECT * FROM " + Inventory03T.TABLE_NAME + " WHERE ( " + Inventory03T.COLUMN_SYNC_STATUS + " = 'no') OR ( " + Inventory03T.COLUMN_SYNC_STATUS + " = 'No')";
+            Cursor cursor = db.rawQuery(getQ, null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                map = new HashMap<>();
+                map.put("UniqueID", cursor.getString(cursor.getColumnIndex("UniqueID")));
+                map.put("TxnDate", cursor.getString(cursor.getColumnIndex("TxnDate")));
+                map.put("LMDID", cursor.getString(cursor.getColumnIndex("LMDID")));
+                map.put("ItemID", cursor.getString(cursor.getColumnIndex("ItemID")));
+                map.put("ItemName", cursor.getString(cursor.getColumnIndex("ItemName")));
+                map.put("Unit", cursor.getString(cursor.getColumnIndex("Unit")));
+                map.put("Type", cursor.getString(cursor.getColumnIndex("Type")));
+                map.put("UnitPrice", cursor.getString(cursor.getColumnIndex("UnitPrice")));
+                map.put("Notes", cursor.getString(cursor.getColumnIndex("Notes")));
+                map.put("Staff_ID", allDetails.get(SessionManager.KEY_STAFF_ID));
 
-            wordList.add(map);
-            cursor.moveToNext();
+                wordList.add(map);
+                cursor.moveToNext();
+            }
+            cursor.close();
+            db.close();
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        cursor.close();
-        db.close();
-        return wordList;
 
+        return wordList;
     }
 
     void updateSyncStatus(JSONArray jsonArray) {
@@ -234,6 +311,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             }
 
         }
+        db.close();
 
     }
 
@@ -285,6 +363,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             }
 
         }
+        db.close();
     }
 
 }

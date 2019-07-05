@@ -22,12 +22,12 @@ public class RestockDBHandler extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "restocks.db";
     private static final int DATABASE_VERSION = 1;
 
-    Context context;
+    //Context context;
 
     public RestockDBHandler(Context context){
         //Class constructor.
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
+        //this.context = context;
     }
 
     @Override
@@ -35,13 +35,13 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
-    public boolean onAdd_RestockT(String LMDID, String ItemID, String RestockValue, String LMDKey, String Count, String RequestDate, String Staff_ID,
-                                  String SyncStatus) {
+    public boolean onAdd_RestockT(String UniqueID, String LMDID, String ItemID, String RestockValue,
+                                  String LMDKey, String Count, String RequestDate, String Staff_ID, String SyncStatus) {
 
         //Insert entries into the RestockT table.
         try{
             SQLiteDatabase db = getWritableDatabase();
-            String insertQ = "INSERT INTO RestockT(LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate,Staff_ID,SyncStatus) VALUES ('" + LMDID +
+            String insertQ = "INSERT INTO RestockT(UniqueID, LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate,Staff_ID,SyncStatus) VALUES ('"+ UniqueID + "','" + LMDID +
                     "','" + ItemID + "','" + RestockValue + "','" + LMDKey + "','" + Count + "','" + RequestDate + "','" + Staff_ID + "','" + SyncStatus + "')";
 
             db.execSQL(insertQ);
@@ -74,28 +74,32 @@ public class RestockDBHandler extends SQLiteAssetHelper {
     ArrayList<Map<String, String>> uploadRestockT() {
         Map<String, String> map;
         ArrayList<Map<String, String>> wordList = new ArrayList<>();
-        Cursor cursor;
-        SQLiteDatabase db = getWritableDatabase();
 
-        cursor = db.rawQuery("SELECT " + RestockT.COLUMN_LMD_ID + "," + RestockT.COLUMN_ITEM_ID + "," + RestockT.COLUMN_RESTOCK_VALUE + "," +
-                RestockT.COLUMN_LMD_KEY + "," + RestockT.COLUMN_COUNT + "," + RestockT.COLUMN_REQUEST_DATE + "," + RestockT.COLUMN_STAFF_ID +
-                " FROM " + RestockT.TABLE_NAME + " WHERE " + RestockT.COLUMN_SYNC_STATUS + "= 'no'", null);
+        try{
+            SQLiteDatabase db = getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT UniqueID, LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate, Staff_ID FROM RestockT WHERE SyncStatus = 'no' OR 'No'", null);
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            map = new HashMap<>();
-            map.put("LMDID", cursor.getString(0));
-            map.put("ItemID", cursor.getString(1));
-            map.put("RestockValue", cursor.getString(2));
-            map.put("LMDKey", cursor.getString(3));
-            map.put("Count", cursor.getString(4));
-            map.put("RequestDate", cursor.getString(5));
-            map.put("Staff_ID", cursor.getString(6));
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                map = new HashMap<>();
+                map.put("UniqueID", cursor.getString(cursor.getColumnIndex("UniqueID")));
+                map.put("LMDID", cursor.getString(cursor.getColumnIndex("LMDID")));
+                map.put("ItemID", cursor.getString(cursor.getColumnIndex("ItemID")));
+                map.put("RestockValue", cursor.getString(cursor.getColumnIndex("RestockValue")));
+                map.put("LMDKey", cursor.getString(cursor.getColumnIndex("LMDKey")));
+                map.put("Count", cursor.getString(cursor.getColumnIndex("Count")));
+                map.put("RequestDate", cursor.getString(cursor.getColumnIndex("RequestDate")));
+                map.put("Staff_ID", cursor.getString(cursor.getColumnIndex("Staff_ID")));
 
-            wordList.add(map);
-            cursor.moveToNext();
+                wordList.add(map);
+                cursor.moveToNext();
+            }
+            cursor.close();
+            db.close();
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        cursor.close();
+
         return wordList;
     }
 
@@ -105,16 +109,15 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 jsonObject = jsonArray.getJSONObject(i);
-                db.execSQL("UPDATE " + RestockT.TABLE_NAME + " SET " + RestockT.COLUMN_SYNC_STATUS + " = '" + jsonObject.getString("SyncStatus")
-                        + "', " + RestockT.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + RestockT.COLUMN_LMD_ID +
-                        "= \"" + jsonObject.getString("LMDID") + "\" AND " + RestockT.COLUMN_LMD_KEY + "= \"" + jsonObject.getString("LMDKey") +
-                        "\" AND " + RestockT.COLUMN_ITEM_ID + "=\"" + jsonObject.getString("ItemID") + "\"");
+                db.execSQL("UPDATE RestockT SET SyncStatus = '" + jsonObject.getString("SyncStatus") + "', SyncDate = '" + jsonObject.getString("SyncDate") + "' WHERE UniqueID" +
+                        " = '" + jsonObject.getString("UniqueID") + "'");
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.d("HERE", e + "");
             }
 
         }
+        db.close();
 
     }
 
