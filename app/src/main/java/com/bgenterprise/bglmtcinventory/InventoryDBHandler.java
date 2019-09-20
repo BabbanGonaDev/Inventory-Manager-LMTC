@@ -40,7 +40,6 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
 
     }
 
-
     @Override
     public void onUpgrade(SQLiteDatabase database, int i, int i2) {
         super.onUpgrade(database, i, i2);
@@ -49,6 +48,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
     boolean onAdd_Inventory03T(String UniqueID, String TxnDate, String LMDID, String ItemID, String ItemName, String Unit, String Type, String UnitPrice,
                                String Notes, String SyncDate, String SyncStatus, String Staff_ID) {
         try {
+            recreateInv03T();
             //Inserts records into the Inventory03T table.
             SQLiteDatabase db = getWritableDatabase();
             String insertQ = "INSERT INTO Inventory03T (UniqueID, TxnDate, LMDID, ItemID, ItemName, Unit, Type, UnitPrice, Notes, SyncDate, SyncStatus, Staff_ID) " +
@@ -58,7 +58,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             Log.d("CHECK", "Inventory03T InsertQ: " + insertQ);
 
             db.execSQL(insertQ);
-            db.close();
+            //db.close();
             return true;
 
         } catch (Exception e) {
@@ -67,7 +67,29 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         }
     }
 
+    public void recreateInv03T() {
+        SQLiteDatabase db = getWritableDatabase();
+        String inv03T_sql = "CREATE TABLE IF NOT EXISTS Inventory03T ( " +
+                "ID	INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "UniqueID	TEXT UNIQUE," +
+                "TxnDate	TEXT," +
+                "LMDID	TEXT," +
+                "ItemID	TEXT," +
+                "ItemName	TEXT," +
+                "Unit	TEXT," +
+                "Type	TEXT," +
+                "UnitPrice	TEXT," +
+                "Notes	TEXT," +
+                "SyncDate	TEXT," +
+                "SyncStatus	TEXT," +
+                "Staff_ID	TEXT)";
+
+        db.execSQL(inv03T_sql);
+        ////db.close();
+    }
+
     void updateInventory03T(JSONArray jsonArray) {
+        recreateInv03T();
         SQLiteDatabase db = getWritableDatabase();
         JSONObject jsonObject;
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -113,13 +135,14 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
                 e.printStackTrace();
             }
         }
-        db.close();
+        //db.close();
 
     }
 
     void ReplaceInventory03T(JSONArray jsonArray){
-        SQLiteDatabase db = getWritableDatabase();
+        recreateInv03T();
 
+        SQLiteDatabase db = getWritableDatabase();
         String clearQ = "DELETE FROM Inventory03T";
         db.execSQL(clearQ);
 
@@ -136,7 +159,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
                 e.printStackTrace();
             }
         }
-        db.close();
+        //db.close();
     }
 
     Integer getNumberOf_FODEntries(String LMDid, String Itemid, String transDate) {
@@ -156,8 +179,30 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         FODEntry_count = cursor.getCount();
 
         cursor.close();
-        db.close();
+        //db.close();
         return FODEntry_count;
+    }
+
+    //Get the sum of Input Distribution given out between today and the last day of invoice generation
+    Integer getIDAmountBtwDays(String lmdid, String itemid, String last_date) {
+        int IDAmount;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date();
+        String todays_date = dateFormat.format(date);
+
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT SUM(Unit) FROM Inventory03T WHERE (LMDID = '" + lmdid + "') AND (ItemID = '" + itemid + "') AND (TxnDate BETWEEN '" + last_date + "' AND '" + todays_date + "') AND Type = 'ID'", null);
+        c.moveToFirst();
+        if (c.getCount() < 1) {
+            return 0;
+        }
+
+        IDAmount = c.getInt(c.getColumnIndex("SUM(Unit)"));
+
+        c.close();
+        //db.close();
+        return IDAmount;
     }
 
     Integer getLMLTotalDeliveries(String LMDid, String item_id) {
@@ -198,7 +243,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return lastDeliveries;
     }
@@ -217,7 +262,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             cursor.moveToNext();
         }
         cursor.close();
-        db.close();
+        //db.close();
         return lastDate;
     }
 
@@ -235,7 +280,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             Log.d("Except", "" + e);
         }
 
-        db.close();
+        //db.close();
         return totalIDQty;
     }
 
@@ -253,7 +298,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             Log.d("Except", "" + e);
         }
 
-        db.close();
+        //db.close();
         return totalIDQty;
     }
 
@@ -288,7 +333,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -311,7 +356,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             }
 
         }
-        db.close();
+        //db.close();
 
     }
 
@@ -319,7 +364,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
         try {
             SQLiteDatabase db = getWritableDatabase();
             db.execSQL("DELETE FROM Inventory03T");
-            db.close();
+            //db.close();
             Log.d("CHECK", "Emptied the Inventory03T table");
             return true;
         } catch (Exception e) {
@@ -363,7 +408,7 @@ public class InventoryDBHandler extends SQLiteAssetHelper {
             }
 
         }
-        db.close();
+        //db.close();
     }
 
 }

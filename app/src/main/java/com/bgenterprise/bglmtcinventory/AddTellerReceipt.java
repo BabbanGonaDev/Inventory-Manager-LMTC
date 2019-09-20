@@ -8,21 +8,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Date;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textview.MaterialTextView;
+
 import java.util.HashMap;
 
 public class AddTellerReceipt extends AppCompatActivity {
     Button btnScanReceiptID, btnSubmitReceiptDetails, btnHome;
-    TextView tv_receipt_id;
+    MaterialTextView tv_receipt_id;
     EditText et_receipt_amount1, et_receipt_amount2;
     SharedPreferences QRPrefs;
     SessionManager session;
@@ -63,7 +64,7 @@ public class AddTellerReceipt extends AppCompatActivity {
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(AddTellerReceipt.this)
+                new MaterialAlertDialogBuilder(AddTellerReceipt.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                         .setTitle("Confirm Action")
                         .setMessage("Are you sure you want to go home without collecting any payment ?")
                         .setPositiveButton("Yes, Go Home", new DialogInterface.OnClickListener() {
@@ -115,10 +116,10 @@ public class AddTellerReceipt extends AppCompatActivity {
             final String UniqueIDForTeller = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis()) + "_TELLER";
 
             //Add the dialog display here to confirm the amount entered.
-            new AlertDialog.Builder(AddTellerReceipt.this)
+            new MaterialAlertDialogBuilder(AddTellerReceipt.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                     .setTitle("Confirm Receipt Details")
                     .setMessage("Are you sure you want to add Receipt: " + tv_receipt_id.getText().toString() + " of " + et_receipt_amount1.getText().toString() + "to this teller ?")
-                    .setPositiveButton("Yes I do", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Yes, Add Receipt", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -128,10 +129,10 @@ public class AddTellerReceipt extends AppCompatActivity {
                                     "no", allDetails.get(SessionManager.KEY_APP_VERSION), allDetails.get(SessionManager.KEY_STAFF_ID), UniqueIDForTeller)) {
 
                                 Toast.makeText(AddTellerReceipt.this, "Receipt " + tv_receipt_id.getText().toString() + " added successfully.", Toast.LENGTH_LONG).show();
-                                new AlertDialog.Builder(AddTellerReceipt.this)
+                                new MaterialAlertDialogBuilder(AddTellerReceipt.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                                         .setTitle("Confirm Action")
                                         .setMessage("Do you still want to enter another receipt for this Teller ?")
-                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton("YES, Enter Another Receipt", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 session.CLEAR_TELLER_RECEIPT_DETAILS();
@@ -140,7 +141,7 @@ public class AddTellerReceipt extends AppCompatActivity {
                                                 recreate();
                                             }
                                         })
-                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                        .setNegativeButton("NO, Go Home", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 session.CLEAR_TELLER_RECEIPT_DETAILS();
@@ -152,7 +153,7 @@ public class AddTellerReceipt extends AppCompatActivity {
 
                         }
                     })
-                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("NO, Go Home", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -185,7 +186,7 @@ public class AddTellerReceipt extends AppCompatActivity {
 
         if(tellerDBHandler.checkTotalTellerAmount(allDetails.get(SessionManager.KEY_TELLER_ID), tellerAmount)){
             //Total amount detected.
-            new AlertDialog.Builder(AddTellerReceipt.this)
+            new MaterialAlertDialogBuilder(AddTellerReceipt.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                     .setTitle("Teller Amount Complete")
                     .setMessage("Total amount has been detected, click OK to finish receipt entry.")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {

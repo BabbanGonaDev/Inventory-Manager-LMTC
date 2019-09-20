@@ -3,25 +3,23 @@ package com.bgenterprise.bglmtcinventory;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceT;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -30,15 +28,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshLMDInvoiceValueT;
-import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownInventory03T;
 import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceGroupT;
-import static com.bgenterprise.bglmtcinventory.SyncModule.SyncUpInventory03T;
-import static com.bgenterprise.bglmtcinventory.SyncModule.updateLMDT;
 
 //import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshInventory03T;
 
@@ -80,6 +73,7 @@ public class TabFragmentSync extends Fragment {
                 final ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setMessage("Syncing down records, please wait");
                 progressDialog.show();
+                progressDialog.setCancelable(false);
 
 
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncDownPriceGroupT syncDownPriceGroupT = new SyncDownPriceGroupT(getActivity().getApplicationContext()) {
@@ -187,6 +181,7 @@ public class TabFragmentSync extends Fragment {
                 final ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setMessage("Syncing up records, please wait");
                 progressDialog.show();
+                progressDialog.setCancelable(false);
                 final int[] countUp = {0};
                 CheckInternetPermission();
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncUpInventory03T syncUpInventory03T = new SyncModule.SyncUpInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
@@ -277,11 +272,11 @@ public class TabFragmentSync extends Fragment {
             @Override
             public void onClick(View v) {
 
-                new AlertDialog.Builder(getActivity())
+                new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                         .setTitle("Confirm Action !!!")
                         .setIcon(R.drawable.warning_sign)
                         .setMessage("This action will destroy and then rebuild Inventory03T, Are you sure you want to do so ?")
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("YES, Rebuild Inventory03T", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -300,7 +295,7 @@ public class TabFragmentSync extends Fragment {
                                 refreshInventory03T.execute();
                             }
                         })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
@@ -315,11 +310,11 @@ public class TabFragmentSync extends Fragment {
             public void onClick(View v) {
 
 
-                new AlertDialog.Builder(getActivity())
+                new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                         .setTitle("Confirm Action !!!")
                         .setMessage("This action will destroy and then rebuild Invoice ValueT, Are you sure you want to do so ?")
                         .setIcon(R.drawable.warning_sign)
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("YES, Rebuild LMD InvoiceValueT", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 HashMap<String, String> val = session.getAllDetails();
@@ -345,7 +340,7 @@ public class TabFragmentSync extends Fragment {
                                 refreshLMDInvoiceValueT.execute(staff_id);
                             }
                         })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();

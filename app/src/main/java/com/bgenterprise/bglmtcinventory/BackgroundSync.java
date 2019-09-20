@@ -3,7 +3,8 @@ package com.bgenterprise.bglmtcinventory;
 import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
-import android.widget.Toast;
+
+import java.util.HashMap;
 
 public class BackgroundSync extends JobService {
     SyncModule.SyncUpInventory03T syncUpInventory03T;
@@ -15,12 +16,15 @@ public class BackgroundSync extends JobService {
     SyncModule.SyncDownPriceT syncDownPriceT;
     SyncModule.SyncDownPriceGroupT syncDownPriceGroupT;
 
-
     @SuppressLint("StaticFieldLeak")
 
     @Override
     public boolean onStartJob(final JobParameters params) {
-        Toast.makeText(getApplicationContext(), "LMTC Auto Sync Engaged...", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "LMTC Auto Sync Engaged...", Toast.LENGTH_LONG).show();
+        SessionManager session = new SessionManager(getApplicationContext());
+        HashMap<String, String> val = session.getAllDetails();
+        String staff_id = val.get(SessionManager.KEY_STAFF_ID);
+
 
         syncUpInventory03T = new SyncModule.SyncUpInventory03T(getApplicationContext()){
             @Override
@@ -60,6 +64,7 @@ public class BackgroundSync extends JobService {
                 jobFinished(params, true);
             }
         };
+        syncUpTellerT.execute();
 
         updateLMDT = new SyncModule.updateLMDT(getApplicationContext()){
             @Override
@@ -67,7 +72,7 @@ public class BackgroundSync extends JobService {
                 jobFinished(params, true);
             }
         };
-        updateLMDT.execute();
+        updateLMDT.execute(staff_id);
 
         syncDownPriceGroupT = new SyncModule.SyncDownPriceGroupT(getApplicationContext()){
             @Override
@@ -75,7 +80,7 @@ public class BackgroundSync extends JobService {
                 jobFinished(params, true);
             }
         };
-        syncDownPriceGroupT.execute();
+        syncDownPriceGroupT.execute(staff_id);
 
         syncDownPriceT = new SyncModule.SyncDownPriceT(getApplicationContext()){
             @Override
@@ -83,7 +88,7 @@ public class BackgroundSync extends JobService {
                 jobFinished(params, true);
             }
         };
-        syncDownPriceT.execute();
+        syncDownPriceT.execute(staff_id);
 
 
 

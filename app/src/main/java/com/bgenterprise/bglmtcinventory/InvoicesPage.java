@@ -5,11 +5,13 @@ package com.bgenterprise.bglmtcinventory;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class InvoicesPage extends AppCompatActivity {
 
@@ -26,7 +28,8 @@ public class InvoicesPage extends AppCompatActivity {
         btnGenerateInvoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(InvoicesPage.this)
+                new MaterialAlertDialogBuilder(InvoicesPage.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+                        .setIcon(R.drawable.ic_error_outline_red_24dp)
                         .setTitle("NOTE")
                         .setMessage("You can only generate an invoice when you do a stock count at the LMD Store.")
                         .setPositiveButton("OK, Got It", new DialogInterface.OnClickListener() {

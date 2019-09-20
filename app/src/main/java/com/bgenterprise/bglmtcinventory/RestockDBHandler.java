@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.bgenterprise.bglmtcinventory.InvoiceDbContract.RestockT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 import org.json.JSONArray;
@@ -35,17 +34,37 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
+
+    public void recreateRestockT() {
+        SQLiteDatabase db = getWritableDatabase();
+        String RestockT_sql = "CREATE TABLE IF NOT EXISTS RestockT ( " +
+                " UniqueID	TEXT PRIMARY KEY," +
+                " LMDID	TEXT," +
+                " ItemID	TEXT," +
+                " RestockValue	TEXT," +
+                " LMDKey	TEXT," +
+                " Count	TEXT," +
+                " RequestDate	TEXT," +
+                " SyncStatus	TEXT," +
+                " SyncDate	TEXT," +
+                " Staff_ID	TEXT)";
+
+        db.execSQL(RestockT_sql);
+        ////db.close();
+    }
+
     public boolean onAdd_RestockT(String UniqueID, String LMDID, String ItemID, String RestockValue,
                                   String LMDKey, String Count, String RequestDate, String Staff_ID, String SyncStatus) {
 
         //Insert entries into the RestockT table.
+        recreateRestockT();
         try{
             SQLiteDatabase db = getWritableDatabase();
             String insertQ = "INSERT INTO RestockT(UniqueID, LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate,Staff_ID,SyncStatus) VALUES ('"+ UniqueID + "','" + LMDID +
                     "','" + ItemID + "','" + RestockValue + "','" + LMDKey + "','" + Count + "','" + RequestDate + "','" + Staff_ID + "','" + SyncStatus + "')";
 
             db.execSQL(insertQ);
-            db.close();
+            //db.close();
             return true;
 
         }catch(Exception e){
@@ -67,14 +86,14 @@ public class RestockDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return restocks;
     }
 
     ArrayList<Map<String, String>> uploadRestockT() {
         Map<String, String> map;
         ArrayList<Map<String, String>> wordList = new ArrayList<>();
-
+        recreateRestockT();
         try{
             SQLiteDatabase db = getWritableDatabase();
             Cursor cursor = db.rawQuery("SELECT UniqueID, LMDID, ItemID, RestockValue, LMDKey, Count, RequestDate, Staff_ID FROM RestockT WHERE SyncStatus = 'no' OR 'No'", null);
@@ -95,7 +114,7 @@ public class RestockDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -117,7 +136,7 @@ public class RestockDBHandler extends SQLiteAssetHelper {
             }
 
         }
-        db.close();
+        //db.close();
 
     }
 

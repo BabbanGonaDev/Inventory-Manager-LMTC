@@ -38,16 +38,36 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
+    public void recreateReceiptT() {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "CREATE TABLE IF NOT EXISTS receipt_table ( " +
+                " receipt_id	TEXT PRIMARY KEY," +
+                " lmd_name	TEXT," +
+                " lmd_id	TEXT," +
+                " lmd_hub	TEXT," +
+                " amount	TEXT," +
+                " moneycollectedby	TEXT," +
+                " staff_id	TEXT," +
+                " date	TEXT," +
+                " SyncStatus	TEXT," +
+                " appVersion	TEXT," +
+                " SyncDate	TEXT)";
+
+        db.execSQL(sql);
+        ////db.close();
+    }
+
     public boolean onAdd(String receipt_id, String lmd_name, String lmd_id, String lmd_hub, String amount,
                          String moneycollectedby, String staff_id, String date, String SyncStatus, String appVersion) {
         //Inserts entries into the Receipt table.
 
         try {
+            recreateReceiptT();
             SQLiteDatabase db = getWritableDatabase();
             String insertQ = "INSERT INTO receipt_table (receipt_id, lmd_name, lmd_id, lmd_hub, amount, moneycollectedby, staff_id, date, SyncStatus, appVersion) VALUES " +
                     "('" + receipt_id + "','" + lmd_name + "','" + lmd_id + "','" + lmd_hub + "','" + amount + "','" + moneycollectedby + "','" + staff_id + "','" + date + "','" + SyncStatus + "','" + appVersion + "')";
             db.execSQL(insertQ);
-            db.close();
+            //db.close();
             return true;
         } catch (Exception e) {
             return false;
@@ -56,6 +76,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
 
     public List<Receipts> getAllReceipts() {
         //Gets a list of all the receipts existing in the database.
+        recreateReceiptT();
         List<Receipts> receipts = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT lmd_name, lmd_id, COUNT(lmd_id) FROM receipt_table GROUP BY lmd_id", null);
@@ -66,7 +87,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return receipts;
     }
 
@@ -83,7 +104,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return list;
     }
 
@@ -111,7 +132,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
             e.printStackTrace();
         }
 
-        db.close();
+        //db.close();
 
         return sum;
     }
@@ -131,7 +152,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         rCount = c.getInt(0);
 
         c.close();
-        db.close();
+        //db.close();
         return rCount;
     }
 
@@ -150,7 +171,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         pDate = c.getString(c.getColumnIndex("date"));
 
         c.close();
-        db.close();
+        //db.close();
         return pDate;
     }
 
@@ -169,7 +190,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
         pAmount = c.getDouble(c.getColumnIndex("amount"));
 
         c.close();
-        db.close();
+        //db.close();
         return pAmount;
     }
 
@@ -178,6 +199,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
     ArrayList<Map<String, String>> uploadReceiptT() {
         Map<String, String> map;
         ArrayList<Map<String, String>> wordList = new ArrayList<>();
+        recreateReceiptT();
         try {
             Cursor cursor;
             SQLiteDatabase db = getWritableDatabase();
@@ -202,7 +224,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
                 wordList.add(map);
                 cursor.moveToNext();
             }
-            db.close();
+            //db.close();
             cursor.close();
         }catch (Exception e){
             e.printStackTrace();
@@ -212,6 +234,7 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
 
     void updateReceiptTableSyncStatus(JSONArray jsonArray) {
         JSONObject jsonObject;
+        recreateReceiptT();
         SQLiteDatabase db = getWritableDatabase();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
@@ -224,6 +247,6 @@ public class ReceiptDBHandler extends SQLiteAssetHelper {
                 Log.d("HERE", e + "");
             }
         }
-        db.close();
+        //db.close();
     }
 }

@@ -2,16 +2,16 @@ package com.bgenterprise.bglmtcinventory;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,22 +54,26 @@ public class View_Teller_Receipts extends AppCompatActivity {
         tellersList = new ArrayList<>();
         tv_teller_id.setText("Teller ID: " + teller_id + " Receipts.");
 
-        TellerDBHandler tellerDBHandler = new TellerDBHandler(View_Teller_Receipts.this);
-        tellersList = tellerDBHandler.getTellerReceipts(teller_id);
+        try {
+            TellerDBHandler tellerDBHandler = new TellerDBHandler(View_Teller_Receipts.this);
+            tellersList = tellerDBHandler.getTellerReceipts(teller_id);
 
-        current_amount = tellerDBHandler.getTotalReceiptAmount(teller_id);
-        tv_current_receipt_amount.setText("Current Amount: " + current_amount );
+            current_amount = tellerDBHandler.getTotalReceiptAmount(teller_id);
+            tv_current_receipt_amount.setText("Current Amount: " + current_amount);
 
-        if(Integer.valueOf(current_amount).equals(Integer.valueOf(teller_amount))){
-            tv_reconciliation_status.setBackgroundColor(Color.GREEN);
-            tv_reconciliation_status.setTextColor(Color.WHITE);
-            tv_reconciliation_status.setText("RECONCILED");
-            btn_add_receipt.setEnabled(false);
-            btn_add_receipt.setBackgroundColor(Color.LTGRAY);
-        }else if(!Integer.valueOf(current_amount).equals(Integer.valueOf(teller_amount))){
-            tv_reconciliation_status.setBackgroundColor(Color.RED);
-            tv_reconciliation_status.setTextColor(Color.WHITE);
-            tv_reconciliation_status.setText("PENDING");
+            if (Integer.valueOf(current_amount).equals(Integer.valueOf(teller_amount))) {
+                tv_reconciliation_status.setBackgroundColor(Color.GREEN);
+                tv_reconciliation_status.setTextColor(Color.WHITE);
+                tv_reconciliation_status.setText("RECONCILED");
+                btn_add_receipt.setEnabled(false);
+                btn_add_receipt.setBackgroundColor(Color.LTGRAY);
+            } else if (!Integer.valueOf(current_amount).equals(Integer.valueOf(teller_amount))) {
+                tv_reconciliation_status.setBackgroundColor(Color.RED);
+                tv_reconciliation_status.setTextColor(Color.WHITE);
+                tv_reconciliation_status.setText("PENDING");
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
 
         tellerReceiptAdapter = new TellerReceiptAdapter(getApplicationContext(), tellersList, new TellerReceiptAdapter.OnItemClickListener() {

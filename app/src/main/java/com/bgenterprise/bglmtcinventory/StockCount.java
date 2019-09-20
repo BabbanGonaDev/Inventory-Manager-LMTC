@@ -11,8 +11,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,9 +18,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bgenterprise.bglmtcinventory.InventoryDbContract.HoldingCostT;
 import com.bgenterprise.bglmtcinventory.InventoryDbContract.Inventory03T;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LMDInvoiceValueT;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -176,10 +177,10 @@ public class StockCount extends AppCompatActivity {
                             Toast.makeText(StockCount.this, "Error in saving Restock Value", Toast.LENGTH_LONG).show();
                         }
 
-                        new AlertDialog.Builder(StockCount.this)
+                        new MaterialAlertDialogBuilder(StockCount.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                                 .setTitle("Stock Count")
                                 .setMessage("Product Count Saved, Do you want to count another product for this LMD ?")
-                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("YES, Count Another Product", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         session.CLEAR_COUNT_DETAILS();
@@ -188,7 +189,7 @@ public class StockCount extends AppCompatActivity {
                                         recreate();
                                     }
                                 })
-                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("NO, Go Home", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         session.CLEAR_COUNT_DETAILS();
@@ -206,7 +207,7 @@ public class StockCount extends AppCompatActivity {
                 }
 
             }else{
-                new AlertDialog.Builder(StockCount.this)
+                new MaterialAlertDialogBuilder(StockCount.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                         .setTitle("Duplicate Count")
                         .setMessage("A Physical Count for " + allDetails.get(SessionManager.KEY_LMD_NAME) + " of " + allDetails.get(SessionManager.KEY_PRODUCT_NAME) + " for today already exists.")
                         .setPositiveButton("Ok, Got it.", new DialogInterface.OnClickListener() {

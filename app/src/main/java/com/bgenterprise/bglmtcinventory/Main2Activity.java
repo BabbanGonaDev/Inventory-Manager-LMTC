@@ -6,9 +6,9 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -36,30 +36,7 @@ public class Main2Activity extends AppCompatActivity {
             Log.d("HERE", "" + staff_id);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            componentName = new ComponentName(this, BackgroundSync.class);
-            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, componentName);
-            builder.setMinimumLatency(3600000);
-
-            //builder.setTriggerContentMaxDelay(100000);
-            builder.setPersisted(true);
-            jobInfo = builder.build();
-            jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-            jobScheduler.schedule(jobInfo);
-            Toast.makeText(this, "Job Scheduled", Toast.LENGTH_SHORT).show();
-
-        } else {
-            componentName = new ComponentName(this, BackgroundSync.class);
-            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, componentName);
-            builder.setPeriodic(3600000);
-            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-            builder.setPersisted(true);
-            jobInfo = builder.build();
-            jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-            jobScheduler.schedule(jobInfo);
-
-        }
-
+        engageAutoSync();
         startActivity(new Intent(Main2Activity.this, Operations.class));
 
 
@@ -68,6 +45,10 @@ public class Main2Activity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        engageAutoSync();
+    }
+
+    public void engageAutoSync() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             componentName = new ComponentName(this, BackgroundSync.class);
             JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, componentName);
@@ -78,7 +59,7 @@ public class Main2Activity extends AppCompatActivity {
             jobInfo = builder.build();
             jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(jobInfo);
-            // Toast.makeText(this, "Job Scheduled", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Job Scheduled", Toast.LENGTH_SHORT).show();
 
         } else {
             componentName = new ComponentName(this, BackgroundSync.class);

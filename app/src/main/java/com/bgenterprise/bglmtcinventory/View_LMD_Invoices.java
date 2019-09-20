@@ -4,21 +4,21 @@ package com.bgenterprise.bglmtcinventory;
  * Activity that displays all invoices for a specific LMD.
  */
 
-import android.content.Context;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.text.DecimalFormat;
-import java.text.Format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +54,7 @@ public class View_LMD_Invoices extends AppCompatActivity {
                 //Get the stuff using LMDID, TxnDate & ItemID.
                 HashMap<String, String> invoiceDetails = db.getInvoiceDetails(lmd_id, txn_date, invoices.getItemID());
 
-                final AlertDialog.Builder dispute = new AlertDialog.Builder(View_LMD_Invoices.this);
+                final MaterialAlertDialogBuilder dispute = new MaterialAlertDialogBuilder(View_LMD_Invoices.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert);
                 LayoutInflater factory = LayoutInflater.from(getApplicationContext());
                 dispute.setCancelable(false);
 

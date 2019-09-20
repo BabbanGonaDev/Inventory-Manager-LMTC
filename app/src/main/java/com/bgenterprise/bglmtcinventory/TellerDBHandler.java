@@ -39,6 +39,25 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
+    public void recreateTellerT() {
+        SQLiteDatabase db = getWritableDatabase();
+        String TellerT_sql = "CREATE TABLE IF NOT EXISTS teller_table ( " +
+                " teller_id  TEXT," +
+                " teller_amount  TEXT," +
+                " teller_bank    TEXT," +
+                " receipt_id TEXT," +
+                " receipt_amount TEXT," +
+                " teller_date    TEXT," +
+                " SyncStatus TEXT," +
+                " app_version	TEXT," +
+                " SyncDate	TEXT," +
+                " Staff_ID	TEXT," +
+                " UniqueID   TEXT PRIMARY KEY)";
+
+        db.execSQL(TellerT_sql);
+        ////db.close();
+    }
+
     public boolean onAdd(String teller_id, String teller_amount, String teller_bank, String receipt_id, String receipt_amount,
                          String teller_date, String sync_status, String app_version, String Staff_ID, String uniqueID) {
 
@@ -49,20 +68,27 @@ public class TellerDBHandler extends SQLiteAssetHelper {
                     "('" + teller_id + "','" + teller_amount + "','" + teller_bank + "','" + receipt_id + "','" + receipt_amount + "','" + teller_date +
                     "','" + sync_status + "','" + app_version + "','" + Staff_ID + "','" + uniqueID + "')";
             db.execSQL(insertQ);
-            db.close();
+            //db.close();
             return true;
 
         } catch (Exception e) {
             Log.d("Prob", "" + e);
+            recreateTellerT();
             return false;
         }
     }
 
     public List<Tellers> getAllTellers() {
         //Gets a list of all the tellers existing in the Teller table.
+        recreateTellerT();
         List<Tellers> tellers = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT teller_id, teller_amount, teller_bank, COUNT(teller_id), teller_date FROM teller_table GROUP BY teller_id", null);
+
+        if (cursor.getCount() < 1) {
+            return null;
+        }
+
         if (cursor.moveToFirst()) {
             do {
                 tellers.add(new Tellers(cursor.getString(cursor.getColumnIndex("teller_id")), cursor.getString(cursor.getColumnIndex("teller_amount")), cursor.getString(cursor.getColumnIndex("teller_bank")),
@@ -72,7 +98,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return tellers;
     }
 
@@ -91,7 +117,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return TellerReceipts;
     }
 
@@ -108,7 +134,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return true;
     }
 
@@ -120,7 +146,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         do {
             current_total = cursor.getDouble(cursor.getColumnIndex("SUM(receipt_amount)"));
         } while (!cursor.isAfterLast());
-        db.close();
+        //db.close();
         return current_total == tellerAmount;
     }
 
@@ -130,13 +156,18 @@ public class TellerDBHandler extends SQLiteAssetHelper {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT SUM(receipt_amount) FROM teller_table WHERE teller_id = '" + Teller_ID + "'", null);
         cursor.moveToFirst();
+
+        if (cursor.getCount() < 1) {
+            return 0;
+        }
+
         do{
             amount = cursor.getInt(cursor.getColumnIndex("SUM(receipt_amount)"));
             cursor.moveToNext();
         }while (!cursor.isAfterLast());
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return Integer.valueOf(amount);
     }
@@ -144,6 +175,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
     ArrayList<Map<String, String>> uploadTellerT() {
         Map<String, String> map;
         ArrayList<Map<String, String>> wordList = new ArrayList<>();
+        recreateTellerT();
         try{
             Cursor cursor;
             SQLiteDatabase db = getWritableDatabase();
@@ -169,7 +201,7 @@ public class TellerDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -187,12 +219,12 @@ public class TellerDBHandler extends SQLiteAssetHelper {
                         + "', " + teller_table.COLUMN_SYNC_DATE + " = \"" + jsonObject.getString("SyncDate") + "\" WHERE " + teller_table.COLUMN_UNIQUE_ID +
                         " = \"" + jsonObject.getString("UniqueID") + "\"");
 
-                db.close();
+
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.d("TellerTSyncStatusEx", e + "");
             }
+            //db.close();
         }
     }
-
 }

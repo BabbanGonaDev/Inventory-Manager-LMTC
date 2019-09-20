@@ -4,12 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -80,10 +82,15 @@ public class View_Receivable extends AppCompatActivity {
 
         DecimalFormat myFormat = new DecimalFormat("#########.###");
 
-        tvLMDID.setText("LMD ID: " + LMD_ID + " Receivables.");
-        tvinvoice_value_today.setText("Total Invoice Value till today: NGN " + myFormat.format(latestInvoice));
-        tvcurrent_receivable.setText("Previous Receivable Amount till today: NGN " + myFormat.format(currentReceivable));
-        tvtotal_receivable.setText("Total Receivables Now: NGN " + myFormat.format(totalReceivable));
+        try {
+            tvLMDID.setText("LMD ID: " + LMD_ID + " Receivables.");
+            tvinvoice_value_today.setText("Total Invoice Value till today: NGN " + myFormat.format(latestInvoice));
+            tvcurrent_receivable.setText("Previous Receivable Amount till today: NGN " + myFormat.format(currentReceivable));
+            tvtotal_receivable.setText("Total Receivables Now: NGN " + myFormat.format(totalReceivable));
+
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
 
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +119,7 @@ public class View_Receivable extends AppCompatActivity {
 
     public void goHome(View view){
 
-        new AlertDialog.Builder(View_Receivable.this)
+        new MaterialAlertDialogBuilder(View_Receivable.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                 .setTitle("Confirm Action")
                 .setMessage("Are you sure you want to go home without collecting any payment ?")
                 .setPositiveButton("Yes, Go Home", new DialogInterface.OnClickListener() {

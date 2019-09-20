@@ -3,10 +3,11 @@ package com.bgenterprise.bglmtcinventory;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-//import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
+//import android.database.sqlite.SQLiteOpenHelper;
 
 public class LMDMapDBHandler extends SQLiteAssetHelper {
 
@@ -56,7 +57,7 @@ public class LMDMapDBHandler extends SQLiteAssetHelper {
         stringLmdID = cursor.getString(cursor.getColumnIndex(lmdid));
 
         cursor.close();
-        db.close();
+        //db.close();
         return stringLmdID;
     }
 
@@ -71,7 +72,7 @@ public class LMDMapDBHandler extends SQLiteAssetHelper {
 
         String lastUpdated = c.getString(c.getColumnIndex(timestamp));
         c.close();
-        db.close();
+        //db.close();
 
         return lastUpdated;
     }
@@ -84,6 +85,6 @@ public class LMDMapDBHandler extends SQLiteAssetHelper {
         db.execSQL(query);
         Log.d("CHECK", query);
 
-        db.close();
+        //db.close();
     }
 }

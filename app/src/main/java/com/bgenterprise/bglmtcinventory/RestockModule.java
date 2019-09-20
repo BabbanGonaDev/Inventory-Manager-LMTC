@@ -60,6 +60,20 @@ public class RestockModule {
 
         }
 
+        public Double SumIDBtwDateDiff() {
+            //This function calculates the amount of input distribution given between today and the last day of stock count.
+            HashMap<String, String> allDetails;
+            session = new SessionManager(context);
+            allDetails = session.getAllDetails();
+            InvoiceDBHandler invDB = new InvoiceDBHandler(context);
+            String last_date = invDB.getFormerInvDate(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID));
+
+            InventoryDBHandler inventoryDB = new InventoryDBHandler(context);
+            Double InputDistAmount = Double.valueOf(inventoryDB.getIDAmountBtwDays(allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), last_date));
+            Log.d("CHECK", "Input Distribution sum btw dates: " + InputDistAmount);
+            return InputDistAmount;
+        }
+
         public Double CalcSalesRate(Double invoiceValue){
             //This function calculates the sales rate by dividing the invoice value by the number of days.
 
@@ -69,7 +83,9 @@ public class RestockModule {
             }
             double salesRate;
             //TODO -> Add ID out rate here too. (InvoiceValue + ID out) all between that period.
-            salesRate = invoiceValue / dateDiff;
+            Double InputDSum = SumIDBtwDateDiff();
+            Double TotalAmountOut = InputDSum + invoiceValue;
+            salesRate = TotalAmountOut / dateDiff;
             Log.d("CHECK SalesRate", "" + salesRate);
 
             return salesRate;

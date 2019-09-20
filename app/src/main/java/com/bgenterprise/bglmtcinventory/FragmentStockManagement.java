@@ -6,12 +6,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.HashMap;
 
@@ -47,15 +49,17 @@ public class FragmentStockManagement extends Fragment {
             public void onClick(View v) {
                 LMD_DBHandler lmd_dbHandler = new LMD_DBHandler(getActivity());
                 if(!lmd_dbHandler.isLMTCInDB(allDetails.get(SessionManager.KEY_STAFF_ID))){
-                    new AlertDialog.Builder(getActivity())
+
+                    new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                             .setTitle("Download Application Data")
                             .setMessage("Kindly download Application data (in Sync/Export tab) before counting.")
                             .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                   dialog.dismiss();
+                                    dialog.dismiss();
                                 }
                             }).show();
+
                 }else {
                     QRPrefs.edit().putString("required", "LMD_Count").commit();
                     QRPrefs.edit().putString("scanner_title", "Scan LMD to Count").commit();

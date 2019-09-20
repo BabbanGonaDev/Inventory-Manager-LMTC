@@ -5,19 +5,23 @@
 
 
     <item
+        android:id="@+id/itemHome"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="Home" />
+    <item
         android:id="@+id/itemStockManagement"
-        android:icon="@drawable/ic_menu_circle"
+        android:icon="@drawable/ic_store"
         android:title="Stock Management" />
     <item
         android:id="@+id/itemPayments"
-        android:icon="@drawable/ic_menu_circle"
+        android:icon="@drawable/ic_payment"
         android:title="Payments" />
     <item
         android:id="@+id/itemReports"
-        android:icon="@drawable/ic_menu_circle"
+        android:icon="@drawable/ic_assignment"
         android:title="Reports" />
     <item
         android:id="@+id/itemSyncing"
-        android:icon="@drawable/ic_menu_circle"
+        android:icon="@drawable/ic_sync"
         android:title="Sync/Export" />
 </menu>

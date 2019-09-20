@@ -10,14 +10,16 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -189,10 +191,10 @@ public class NewReceipt extends AppCompatActivity {
             Toast.makeText(NewReceipt.this, "Kindly Confirm Receipt Details Again", Toast.LENGTH_LONG).show();
 
         }else{
-            new AlertDialog.Builder(NewReceipt.this)
+            new MaterialAlertDialogBuilder(NewReceipt.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                     .setTitle("Confirm Receipt Entry")
                     .setMessage("Are you sure you want to enter this receipt of NGN " + etAmount1.getText().toString() + " from " + tvLMDName.getText().toString() +" ?")
-                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("YES, Enter Receipt", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -213,7 +215,7 @@ public class NewReceipt extends AppCompatActivity {
                             }
                         }
                     })
-                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();

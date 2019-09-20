@@ -8,11 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.Result;
 
 import java.util.HashMap;
@@ -121,10 +122,10 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
                     }else if(!invoicedb.isLMDinPriceGroup(data[1])){
-                        new AlertDialog.Builder(this)
+                        new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                                 .setTitle("Unknown Price Group")
-                                .setMessage(data[0] + " was not found in any price group")
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                .setMessage(data[0] + " (" + data[1] + ") was not found in any price group")
+                                .setPositiveButton("OK, Got It", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         startActivity(new Intent(ScannerActivity.this, Operations.class));
@@ -178,10 +179,10 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
                     if(tellerDBHandler.checkDuplicateTellerReceipt(data[0], allDetails.get(SessionManager.KEY_TELLER_ID))){
                         //A matching receipt id was found.
-                        new AlertDialog.Builder(this)
+                        new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                                 .setTitle("Duplicate Receipt ID")
                                 .setMessage("This Receipt ID already exists in the database.")
-                                .setPositiveButton("OK, Scan Another...", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("OK, Scan Another Receipt", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         session.CLEAR_TELLER_RECEIPT_DETAILS();

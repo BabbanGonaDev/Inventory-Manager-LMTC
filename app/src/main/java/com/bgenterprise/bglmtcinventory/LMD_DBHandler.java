@@ -32,7 +32,19 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
+    public void recreateLMDT() {
+        SQLiteDatabase db = getWritableDatabase();
+        String LmdT_sql = "CREATE TABLE IF NOT EXISTS LMDT ( " +
+                "LMD_ID	TEXT," +
+                "LMD_Name	TEXT," +
+                "LMTC_ID    TEXT)";
+
+        db.execSQL(LmdT_sql);
+
+    }
+
     public List<LMD> getLMTCLMDs(String LMTCID){
+        recreateLMDT();
         //Gets a list of all the LMDs assigned to that LMTC.
         List<LMD> lmdList = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
@@ -43,13 +55,13 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
             cursor.moveToNext();
         }
         cursor.close();
-        db.close();
+        //db.close();
         return lmdList;
     }
 
     void updateLMDT(JSONArray jsonArray) {
+        recreateLMDT();
         SQLiteDatabase db = getWritableDatabase();
-
         //Truncate the table here before beginning insertion.
         //This works because we are sending the entire json array to the function.
 
@@ -67,7 +79,7 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
                 contentValues.put(LMDT.COLUMN_LMTC_ID, jsonObject.getString("LMTC_ID"));
 
                 db.insert(LMDT.TABLE_NAME, null, contentValues);
-                db.close();
+                //db.close();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -107,7 +119,7 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
                     db.update(LMDT.TABLE_NAME, contentValues, where, whereArgs);
                 }
 
-                db.close();
+                //db.close();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -116,13 +128,14 @@ public class LMD_DBHandler extends SQLiteAssetHelper {
     }
 
     public boolean isLMTCInDB(String lmtcid){
+        recreateLMDT();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM LMDT WHERE LMTC_ID = '"+ lmtcid +"'", null);
         if(cursor.getCount() < 1){
             return false;
         }
         cursor.close();
-        db.close();
+        //db.close();
         return true;
     }
 }

@@ -8,11 +8,12 @@ package com.bgenterprise.bglmtcinventory;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -45,19 +46,23 @@ public class TellersAdapter extends RecyclerView.Adapter<TellersAdapter.TellersV
         final Tellers tellers = tellersList.get(position);
 
         TellerDBHandler tellerDBHandler = new TellerDBHandler(context);
-        Integer current_amount = tellerDBHandler.getTotalReceiptAmount(tellers.getTeller_id());
-        if(Integer.valueOf(current_amount) < Integer.valueOf(tellers.getTeller_amount())){
-            holder.tv_tellerID.setBackgroundColor(Color.RED);
-            holder.tv_tellerID.setTextColor(Color.WHITE);
-        }else{
-            holder.tv_tellerID.setBackgroundColor(Color.GREEN);
-            holder.tv_tellerID.setTextColor(Color.BLUE);
-        }
+        try {
+            Integer current_amount = tellerDBHandler.getTotalReceiptAmount(tellers.getTeller_id());
+            if (Integer.valueOf(current_amount) < Integer.valueOf(tellers.getTeller_amount())) {
+                holder.tv_tellerID.setBackgroundColor(Color.RED);
+                holder.tv_tellerID.setTextColor(Color.WHITE);
+            } else {
+                holder.tv_tellerID.setBackgroundColor(Color.GREEN);
+                holder.tv_tellerID.setTextColor(Color.BLUE);
+            }
 
-        holder.tv_tellerID.setText("Teller ID: " + tellers.getTeller_id());
-        holder.tv_tellerAmount.setText("Teller Amount: " + tellers.getTeller_amount());
-        holder.tv_tellerBank.setText("Bank: " + tellers.getTeller_bank());
-        holder.tv_receiptCount.setText("Total Number of Receipts: " + tellers.getReceipt_count());
+            holder.tv_tellerID.setText("Teller ID: " + tellers.getTeller_id());
+            holder.tv_tellerAmount.setText("Teller Amount: " + tellers.getTeller_amount());
+            holder.tv_tellerBank.setText("Bank: " + tellers.getTeller_bank());
+            holder.tv_receiptCount.setText("Total Number of Receipts: " + tellers.getReceipt_count());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -1,7 +1,6 @@
 package com.bgenterprise.bglmtcinventory;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -1114,8 +1113,6 @@ public class SyncModule {
             }
         }
     }
-
-
 
 
 }

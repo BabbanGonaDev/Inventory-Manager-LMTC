@@ -5,13 +5,12 @@ package com.bgenterprise.bglmtcinventory;
 */
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -64,7 +63,13 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
 
     @Override
     public int getItemCount(){
-        return invoicesList.size();
+        int size = 0;
+        try {
+            size = invoicesList.size();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return size;
     }
 
 
@@ -72,10 +77,15 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
     public void onBindViewHolder(final AllInvoicesViewHolder holder, final int position){
         final Invoices invoices = invoicesList.get(position);
 
-        holder.tv_invoice_LMDID.setText("LMD ID: " + invoices.getLMDID());
-        holder.tv_invoice_date.setText("Invoice Date: " + invoices.getTxnDate());
-        holder.tv_invoiceCount.setText("No of Invoices: " + invoices.getInvoiceCount());
-        holder.tv_invoiceAmount.setText("Total Invoice Amount: " + invoices.getInvoiceAmount());
+        try {
+            holder.tv_invoice_LMDID.setText("LMD ID: " + invoices.getLMDID());
+            holder.tv_invoice_date.setText("Invoice Date: " + invoices.getTxnDate());
+            holder.tv_invoiceCount.setText("No of Invoices: " + invoices.getInvoiceCount());
+            holder.tv_invoiceAmount.setText("Total Invoice Amount: " + invoices.getInvoiceAmount());
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
     }
 }

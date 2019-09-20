@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LMDInvoiceValueT;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.LeadTimeT;
-import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceGroupT;
 import com.bgenterprise.bglmtcinventory.InvoiceDbContract.PriceT;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -47,12 +46,37 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         super.onUpgrade(database, i, i2);
     }
 
+    public void recreateLMDinvT() {
+        SQLiteDatabase db = getWritableDatabase();
+        String LMDinvT_sql = "CREATE TABLE IF NOT EXISTS LMDInvoiceValueT ( " +
+                "ID	INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "UniqueID	TEXT UNIQUE," +
+                "LMDID	TEXT," +
+                "ItemID	TEXT," +
+                "FODPhysicalCount	TEXT," +
+                "TxnDate	TEXT," +
+                "Type	TEXT," +
+                "UnitPrice	TEXT," +
+                "InvoiceQty	TEXT," +
+                "InvoiceValue	TEXT," +
+                "LastFODCount	TEXT," +
+                "LastFODdate	TEXT," +
+                "DeliverySinceLastCount	TEXT," +
+                "HoldingCost	TEXT," +
+                "SyncDate	TEXT," +
+                "SyncStatus	TEXT," +
+                "Staff_ID	TEXT)";
+        db.execSQL(LMDinvT_sql);
+        ////db.close();
+    }
+
     //Insert into the Invoice Database.
     boolean onAdd_LMDInvoiceValueT(String UniqueID, String LMDID, String ItemID, String FODPhysicalCount, String TxnDate, String Type, String UnitPrice,
                                    String InvoiceQty, String InvoiceValue, String LastFODCount, String LastFODDate, String DeliverySinceLastCount,
                                    String Staff_ID, String SyncStatus) {
 
         try{
+            recreateLMDinvT();
             SQLiteDatabase db = getWritableDatabase();
             String insertQ = "INSERT INTO LMDInvoiceValueT (UniqueID, LMDID, ItemID, FODPhysicalCount, TxnDate, Type, UnitPrice, InvoiceQty, InvoiceValue, LastFODCount," +
                     " LastFODdate, DeliverySinceLastCount, Staff_ID, SyncStatus) VALUES ('"+ UniqueID +"','" + LMDID + "','" + ItemID + "','" + FODPhysicalCount + "','" + TxnDate
@@ -60,7 +84,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                     "','" + DeliverySinceLastCount + "','" + Staff_ID + "','" + SyncStatus + "')";
             Log.d("CHECK", "Insert into LMDInvoiceValueT Query: " + insertQ);
             db.execSQL(insertQ);
-            db.close();
+            //db.close();
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -88,7 +112,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         group = cursor.getString(cursor.getColumnIndex("PGName"));
 
         cursor.close();
-        db.close();
+        //db.close();
         return group;
     }
 
@@ -105,7 +129,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         count = cursor.getCount();
 
         cursor.close();
-        db.close();
+        //db.close();
         return count;
     }
 
@@ -119,7 +143,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         ItemPrice = cursor.getDouble(cursor.getColumnIndex("Price"));
 
         cursor.close();
-        db.close();
+        //db.close();
         return ItemPrice;
     }
 
@@ -136,7 +160,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return formerPrice.get(1);
     }
 
@@ -150,7 +174,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         date = cursor.getString(cursor.getColumnIndex("ChngDate"));
 
         cursor.close();
-        db.close();
+        //db.close();
         return date;
     }
 
@@ -158,7 +182,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
     //Get the sum of total Invoices for an LMD and Item.
     Integer getTotalInvoices(String LMDid, String item_id) {
         int totalInvoices;
-
+        recreateLMDinvT();
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.rawQuery("SELECT SUM(InvoiceQty) FROM LMDInvoiceValueT WHERE LMDID = '" + LMDid + "' AND ItemID = '" + item_id + "'", null);
         c.moveToFirst();
@@ -170,7 +194,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         totalInvoices = c.getInt(0);
 
         c.close();
-        db.close();
+        //db.close();
         return totalInvoices;
     }
 
@@ -188,7 +212,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 
         lastDate = c.getString(c.getColumnIndex("TxnDate"));
         c.close();
-        db.close();
+        //db.close();
         return lastDate;
     }
 
@@ -207,7 +231,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         iAmount = c.getInt(0);
 
         c.close();
-        db.close();
+        //db.close();
         return iAmount;
     }
 
@@ -221,7 +245,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 //        totalInvoices = c.getInt(0);
 //
 //        c.close();
-//        db.close();
+//        //db.close();
 //        return totalInvoices;
 //    }
 
@@ -240,7 +264,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
 
 
         c.close();
-        db.close();
+        //db.close();
         return amount;
     }
 
@@ -257,7 +281,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
             return invoices;
         }catch (Exception e){
             e.printStackTrace();
@@ -280,7 +304,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
             return invoices;
         }catch(Exception e){
             return null;
@@ -301,7 +325,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
             return list;
         }catch(Exception e){
             return null;
@@ -324,7 +348,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
 
         //Try to return the second to most recent date and if there isn't any, return 0000.
 
@@ -356,7 +380,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }while(!cursor.isAfterLast());
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return sum;
     }
@@ -381,7 +405,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }while(!cursor.isAfterLast());
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return latest;
     }
@@ -407,7 +431,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return lastCount;
     }
@@ -427,7 +451,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
             Log.d("getleadtimeExcep", "" + e);
         }
 
-        db.close();
+        //db.close();
         return leadTime;
     }
 
@@ -450,7 +474,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }
 
         c.close();
-        db.close();
+        //db.close();
         return invoiceDetails;
     }
 
@@ -467,7 +491,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 e.printStackTrace();
             }
         }
-        db.close();
+        //db.close();
     }
 
     void updatePriceT(JSONArray jsonArray) {
@@ -514,53 +538,49 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 e.printStackTrace();
             }
         }
-        db.close();
+        //db.close();
 
     }
 
     void RefreshLMDInvoiceValueT(JSONArray jsonArray) {
+        recreateLMDinvT();
+
         SQLiteDatabase db = getWritableDatabase();
+
+        String clearQ = "DELETE FROM LMDInvoiceValueT";
+        db.execSQL(clearQ);
+
         JSONObject jsonObject;
         for (int i = 0; i < jsonArray.length(); i++) {
-
             try {
                 int check = 0;
                 jsonObject = jsonArray.getJSONObject(i);
-                Cursor cursor;
-                cursor = db.rawQuery("SELECT COUNT(" + LMDInvoiceValueT.COLUMN_ID + ") FROM " + LMDInvoiceValueT.TABLE_NAME + " WHERE UniqueID = '" + jsonObject.getString("UniqueID") + "'" , null);
-
-                cursor.moveToFirst();
-                if (!cursor.isAfterLast()) {
-                    check = cursor.getInt(0);
-                }
-                cursor.close();
                 ContentValues contentValues = new ContentValues();
-                if (check == 0) {
-                    contentValues.put("UniqueID", jsonObject.getString("UniqueID"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_ITEM_ID, jsonObject.getString("ItemID"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_LMD_ID, jsonObject.getString("LMDID"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_FOD_PHYSICAL_COUNT, jsonObject.getString("FODPhysicalCount"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_TXN_DATE, jsonObject.getString("TxnDate"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_TYPE, jsonObject.getString("Type"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_UNIT_PRICE, jsonObject.getString("UnitPrice"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_QTY, jsonObject.getString("InvoiceQty"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_VALUE, jsonObject.getString("InvoiceValue"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_COUNT, jsonObject.getString("LastFODCount"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_DATE, jsonObject.getString("LastFODdate"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_DELIVERY_SINCE_LAST_COUNT, jsonObject.getString("DeliverySinceLastCount"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, jsonObject.getString("HoldingCost"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_DATE, jsonObject.getString("SyncDate"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_STATUS, jsonObject.getString("SyncStatus"));
-                    contentValues.put(LMDInvoiceValueT.COLUMN_STAFF_ID, jsonObject.getString("Staff_ID"));
 
-                    db.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
-                }
+                contentValues.put("UniqueID", jsonObject.getString("UniqueID"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_ITEM_ID, jsonObject.getString("ItemID"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_LMD_ID, jsonObject.getString("LMDID"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_FOD_PHYSICAL_COUNT, jsonObject.getString("FODPhysicalCount"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_TXN_DATE, jsonObject.getString("TxnDate"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_TYPE, jsonObject.getString("Type"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_UNIT_PRICE, jsonObject.getString("UnitPrice"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_QTY, jsonObject.getString("InvoiceQty"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_INVOICE_VALUE, jsonObject.getString("InvoiceValue"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_COUNT, jsonObject.getString("LastFODCount"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_LAST_FOD_DATE, jsonObject.getString("LastFODdate"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_DELIVERY_SINCE_LAST_COUNT, jsonObject.getString("DeliverySinceLastCount"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_HOLDING_COST, jsonObject.getString("HoldingCost"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_DATE, jsonObject.getString("SyncDate"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_SYNC_STATUS, jsonObject.getString("SyncStatus"));
+                contentValues.put(LMDInvoiceValueT.COLUMN_STAFF_ID, jsonObject.getString("Staff_ID"));
+
+                db.insert(LMDInvoiceValueT.TABLE_NAME, null, contentValues);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        db.close();
+        //db.close();
     }
 
     void updateLeadTimeT(JSONArray jsonArray) {
@@ -602,7 +622,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 e.printStackTrace();
             }
         }
-        db.close();
+        //db.close();
     }
 
     ArrayList<Map<String, String>> uploadLMDInvValueT() {
@@ -636,7 +656,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            db.close();
+            //db.close();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -656,7 +676,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
                 Log.d("HERE", e + "");
             }
         }
-        db.close();
+        //db.close();
     }
 
     boolean preventProductCountTwice(String LMDid, String itemId){
@@ -676,7 +696,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return false;
     }
 
@@ -687,7 +707,7 @@ public class InvoiceDBHandler extends SQLiteAssetHelper {
             return false;
         }
         c.close();
-        db.close();
+        //db.close();
         return true;
     }
 
