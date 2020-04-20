@@ -9,12 +9,12 @@ import java.util.HashMap;
 public class BackgroundSync extends JobService {
     SyncModule.SyncUpInventory03T syncUpInventory03T;
     SyncModule.SyncUpLMDInvValueT syncUpLMDInvValueT;
-    SyncModule.SyncUpReceiptTable syncUpReceiptTable;
+    /*SyncModule.SyncUpReceiptTable syncUpReceiptTable;
     SyncModule.SyncUpRestockT syncUpRestockT;
-    SyncModule.SyncUpTellerT syncUpTellerT;
+    SyncModule.SyncUpTellerT syncUpTellerT;*/
     SyncModule.updateLMDT updateLMDT;
-    SyncModule.SyncDownPriceT syncDownPriceT;
-    SyncModule.SyncDownPriceGroupT syncDownPriceGroupT;
+    /*SyncModule.SyncDownPriceT syncDownPriceT;
+    SyncModule.SyncDownPriceGroupT syncDownPriceGroupT;*/
 
     @SuppressLint("StaticFieldLeak")
 
@@ -42,7 +42,7 @@ public class BackgroundSync extends JobService {
         };
         syncUpLMDInvValueT.execute();
 
-        syncUpReceiptTable = new SyncModule.SyncUpReceiptTable(getApplicationContext()){
+        /*syncUpReceiptTable = new SyncModule.SyncUpReceiptTable(getApplicationContext()){
             @Override
             protected void onPostExecute(String s) {
                 jobFinished(params, true);
@@ -64,7 +64,7 @@ public class BackgroundSync extends JobService {
                 jobFinished(params, true);
             }
         };
-        syncUpTellerT.execute();
+        syncUpTellerT.execute();*/
 
         updateLMDT = new SyncModule.updateLMDT(getApplicationContext()){
             @Override
@@ -74,7 +74,7 @@ public class BackgroundSync extends JobService {
         };
         updateLMDT.execute(staff_id);
 
-        syncDownPriceGroupT = new SyncModule.SyncDownPriceGroupT(getApplicationContext()){
+        /*syncDownPriceGroupT = new SyncModule.SyncDownPriceGroupT(getApplicationContext()){
             @Override
             protected void onPostExecute(String s) {
                 jobFinished(params, true);
@@ -88,9 +88,7 @@ public class BackgroundSync extends JobService {
                 jobFinished(params, true);
             }
         };
-        syncDownPriceT.execute(staff_id);
-
-
+        syncDownPriceT.execute(staff_id);*/
 
         return true;
     }

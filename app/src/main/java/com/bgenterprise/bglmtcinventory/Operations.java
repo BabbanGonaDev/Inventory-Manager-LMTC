@@ -26,6 +26,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Operations extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -119,7 +120,6 @@ public class Operations extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment = null;
@@ -128,10 +128,6 @@ public class Operations extends AppCompatActivity
 
         if (id == R.id.itemStockManagement) {
             fragment  = new FragmentStockManagement();
-        } else if (id == R.id.itemPayments) {
-            fragment = new FragmentPayments();
-        } else if (id == R.id.itemReports) {
-            fragment = new FragmentReports();
         } else if (id == R.id.itemSyncing) {
             fragment = new FragmentSyncing();
         } else if (id == R.id.itemHome) {
@@ -140,18 +136,12 @@ public class Operations extends AppCompatActivity
 
         //PUT THE FRAGMENT STUFF HERE.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frameForButtons, fragment);
+        transaction.replace(R.id.frameForButtons, Objects.requireNonNull(fragment));
         transaction.commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    public String getLastSyncDate() {
-
-        return null;
-    }
-
 
 }

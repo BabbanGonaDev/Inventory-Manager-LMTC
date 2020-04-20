@@ -30,7 +30,6 @@ public class ReceiptsPage extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(ReceiptsPage.this, new String[]{Manifest.permission.CAMERA}, 20);
-
         }
 
         btnEnterReceipt.setOnClickListener(new View.OnClickListener() {

@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceGroupT;
+//import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceGroupT;
 
 //import static com.bgenterprise.bglmtcinventory.SyncModule.RefreshInventory03T;
 
@@ -39,12 +39,11 @@ import static com.bgenterprise.bglmtcinventory.SyncModule.SyncDownPriceGroupT;
 /**
  * A simple {@link Fragment} subclass.
  */
+
 public class TabFragmentSync extends Fragment {
     View view;
     SessionManager session;
-    //    Button btnSyncDownInventory03T, btnSyncUpInventory03T, btnRefreshInventory03T, btnSyncDownPgroupT, btnSyncDownPriceT,
-//            btnRefreshLMDInvValueT, btnUpdateLMDT, btnUploadLmdInvValT, btnUploadReceiptT, btnUploadRestockT, btnUploadTellerT,
-//            btnUpdateHoldCostT;
+
     Button btnUploadData, btnDownloadData, btnRefresh, btnRefresh03T;
 
     public TabFragmentSync() {
@@ -75,20 +74,6 @@ public class TabFragmentSync extends Fragment {
                 progressDialog.show();
                 progressDialog.setCancelable(false);
 
-
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownPriceGroupT syncDownPriceGroupT = new SyncDownPriceGroupT(getActivity().getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(@NonNull String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "PriceGroupT Sync Down: " +s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countDown[0]++;
-                            Log.d("countdownPGT", String.valueOf(countDown[0]));
-                        }
-                    }
-                };
-                syncDownPriceGroupT.execute(staff_id);
-
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncDownInventory03T syncDownInventory03T = new SyncModule.SyncDownInventory03T(getActivity().getApplicationContext()) {
                     @Override
                     protected void onPostExecute(String s) {
@@ -102,45 +87,6 @@ public class TabFragmentSync extends Fragment {
                 };
                 syncDownInventory03T.execute(staff_id);
 
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownPriceT syncDownPriceT = new SyncModule.SyncDownPriceT(getActivity().getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "SyncDown PriceT: " + s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countDown[0]++;
-                            Log.d("countdownPriceT", String.valueOf(countDown[0]));
-                        }
-                    }
-                };
-                syncDownPriceT.execute(staff_id);
-
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownHoldingCostT syncDownHoldingCostT = new SyncModule.SyncDownHoldingCostT(getActivity().getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "Sync Down Holding CostT: " + s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countDown[0]++;
-                            Log.d("countdownHcT", String.valueOf(countDown[0]));
-                        }
-                    }
-                };
-                syncDownHoldingCostT.execute();
-
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncDownLeadTimeT syncDownLeadTimeT = new SyncModule.SyncDownLeadTimeT((getActivity()).getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "LeadTimeT Sync Down: " + s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countDown[0]++;
-                            Log.d("countdownLeadT", String.valueOf(countDown[0]));
-                        }
-                    }
-                };
-                syncDownLeadTimeT.execute(staff_id);
-
                 @SuppressLint("StaticFieldLeak") SyncModule.updateLMDT sync5 = new SyncModule.updateLMDT((getActivity()).getApplicationContext()) {
                     @Override
                     protected void onPostExecute(String s) {
@@ -150,20 +96,10 @@ public class TabFragmentSync extends Fragment {
                             countDown[0]++;
                             Log.d("countdownLMDT", String.valueOf(countDown[0]));
                         }
-                        Log.d("Countdown", "" + countDown[0]);
+
                         if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
-
-                        /*if (countDown[0] == 6) {
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync down functions successful", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync down function failed, " +
-                                    "please check your internet connection", Toast.LENGTH_LONG).show();
-                        }*/
                     }
                 };
                 sync5.execute(staff_id);
@@ -181,7 +117,7 @@ public class TabFragmentSync extends Fragment {
                 final ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setMessage("Syncing up records, please wait");
                 progressDialog.show();
-                progressDialog.setCancelable(false);
+                progressDialog.setCancelable(true);
                 final int[] countUp = {0};
                 CheckInternetPermission();
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncUpInventory03T syncUpInventory03T = new SyncModule.SyncUpInventory03T(Objects.requireNonNull(getActivity()).getApplicationContext()) {
@@ -205,70 +141,19 @@ public class TabFragmentSync extends Fragment {
                         if (s.trim().equalsIgnoreCase("done")) {
                             countUp[0]++;
                             Log.d("countUp", String.valueOf(countUp[0]));
+
+                            if(progressDialog.isShowing()){
+                                progressDialog.dismiss();
+                            }
                         }
                     }
                 };
                 syncUpLMDInvValueT.execute();
 
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpReceiptTable syncUpReceiptTable = new SyncModule.SyncUpReceiptTable(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "Sync up Receipt Table: " + s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countUp[0]++;
-                            Log.d("countUp", String.valueOf(countUp[0]));
-                        }
-                    }
-                };
-                syncUpReceiptTable.execute();
-
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpRestockT syncUpRestockT = new SyncModule.SyncUpRestockT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "Sync Up Restock T: " + s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countUp[0]++;
-                            Log.d("countUp", String.valueOf(countUp[0]));
-                        }
-                    }
-                };
-                syncUpRestockT.execute();
-
-                @SuppressLint("StaticFieldLeak") SyncModule.SyncUpTellerT syncUpTellerT = new SyncModule.SyncUpTellerT(Objects.requireNonNull(getActivity()).getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Log.d("s", "" + s);
-                        Toast.makeText(getActivity(), "Sync Up Teller T: " + s, Toast.LENGTH_LONG).show();
-                        if (s.trim().equalsIgnoreCase("done")) {
-                            countUp[0]++;
-                            Log.d("countUp", String.valueOf(countUp[0]));
-                        }
-
-                        Log.d("CountUp", "" + countUp[0]);
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
-
-                        /*if (countUp[0] == 5) {
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync up functions successful", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "Sync up function failed, " +
-                                    "please check your internet connection", Toast.LENGTH_LONG).show();
-                        }*/
-                    }
-                };
-                syncUpTellerT.execute();
-
-
             }
         });
 
-        btnRefresh03T.setOnClickListener(new View.OnClickListener() {
+        /*btnRefresh03T.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -302,10 +187,10 @@ public class TabFragmentSync extends Fragment {
                             }
                         }).show();
             }
-        });
+        });*/
 
 
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
+        /*btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -347,7 +232,7 @@ public class TabFragmentSync extends Fragment {
                             }
                         }).show();
             }
-        });
+        });*/
 
         return view;
     }

@@ -12,10 +12,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="30dp">
+            android:layout_marginTop="30dp"
+            android:orientation="vertical">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_upload_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_color_white" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_download_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_color_white" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_refresh_invoiceT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -48,9 +48,10 @@
                 android:padding="10dp"
                 android:text="Rebuild LMDInvoice Database"
                 android:textAllCaps="false"
-                android:textColor="@color/text_color_white" />
+                android:textColor="@color/text_color_white"
+                android:visibility="gone" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_refresh_inventory03T"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,118 +61,8 @@
                 android:padding="10dp"
                 android:text="Rebuild Inventory03T Database"
                 android:textAllCaps="false"
-                android:textColor="@color/text_color_white" />
-
-
-            <!--<Button-->
-            <!--android:id="@+id/btnSyncUpInventory03T"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync Up Inventory-03T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--&lt;!&ndash;<Button&ndash;&gt;-->
-            <!--&lt;!&ndash;android:id="@+id/btnRefreshInventory03T"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_gravity="center_horizontal"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:background="@drawable/rounded_border"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:text="Refresh Inventory-03T"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:textColor="@color/text_color_white" />&ndash;&gt;-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnSyncDownPgroupT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync down PriceGroup-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnSyncDownPriceT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync down Price-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnRefreshLMDIVT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Refresh LMD Invoice Value-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnUpdateLMDT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Update LMD-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnUploadLmdInvValueT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync Up LMDInvoiceValue-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnUploadReceiptT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync Up Receipt-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnUploadRestockT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync Up Restock-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnUploadTellerT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync Up Teller-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
-
-            <!--<Button-->
-            <!--android:id="@+id/btnUpdateHoldingCostT"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:background="@drawable/rounded_border"-->
-            <!--android:text="Sync down HoldingCost-T"-->
-            <!--android:textColor="@color/text_color_white" />-->
+                android:textColor="@color/text_color_white"
+                android:visibility="gone" />
 
         </LinearLayout>
 
