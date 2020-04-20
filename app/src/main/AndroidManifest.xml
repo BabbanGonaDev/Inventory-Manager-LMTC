@@ -55,37 +55,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ScannerActivity" />
         <activity
-            android:name=".ReceiptsPage"
-            android:label="Receipt Menu" />
-        <activity
             android:name=".InvoicesPage"
             android:label="Invoice Menu" />
-        <activity android:name=".NewReceipt" />
         <activity android:name=".StockCount" />
-        <activity
-            android:name=".View_All_Invoices"
-            android:label="View All Invoices" />
-        <activity
-            android:name=".View_All_Receipts"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".View_LMD_Receipts"
-            android:label="View LMD Receipts" />
-        <activity android:name=".TellerPage" />
-        <activity
-            android:name=".View_All_Tellers"
-            android:label="View Tellers" />
-        <activity android:name=".NewTeller" />
-        <activity android:name=".AddTellerReceipt" />
+        <activity android:name=".ReportsPage"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".View_LMD_Invoices"
             android:label="View LMD Invoices" />
-        <activity android:name=".View_Receivable" />
-        <activity android:name=".View_Teller_Receipts" />
-        <activity
-            android:name=".ReportsPage"
-            android:label="LMD Reports."
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".View_Reports" />
         <activity
             android:name=".DataActivity"

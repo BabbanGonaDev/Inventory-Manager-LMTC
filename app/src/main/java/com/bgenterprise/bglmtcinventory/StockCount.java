@@ -46,7 +46,6 @@ public class StockCount extends AppCompatActivity {
     SharedPreferences QRPrefs;
     InvoiceDBHandler invoiceDBHandler;
     InventoryDBHandler inventoryDBHandler;
-    RestockDBHandler restockDBHandler;
     HashMap<String, String> allDetails;
     String currentDate;
 
@@ -58,7 +57,6 @@ public class StockCount extends AppCompatActivity {
         session = new SessionManager(StockCount.this);
         invoiceDBHandler = new InvoiceDBHandler(StockCount.this);
         inventoryDBHandler = new InventoryDBHandler(StockCount.this);
-        restockDBHandler = new RestockDBHandler(StockCount.this);
         allDetails = session.getAllDetails();
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -111,7 +109,7 @@ public class StockCount extends AppCompatActivity {
 
             String LastFODCount = lastCountDetails.get("FODPhysicalCount");
             String LastFODDate = lastCountDetails.get("TxnDate");
-            int lastCount = Integer.valueOf(LastFODCount);
+            int lastCount = Integer.parseInt(LastFODCount);
             Log.d("lastCount", "" + lastCount);
 
             //Get the total Ins and Outs since the lastFODdate.
@@ -124,7 +122,6 @@ public class StockCount extends AppCompatActivity {
 
             InvoiceModule.InvoiceBlock invoiceBlock = new InvoiceModule.InvoiceBlock(StockCount.this);
             Double invoiceQty = invoiceBlock.calculateInvoiceQuantity(Integer.parseInt(etCount.getText().toString()), allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID));
-            Double invoiceQtyForRestock = invoiceBlock.calcInvQtyForRestock(Integer.parseInt(etCount.getText().toString()), allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID));
 
             Double invoiceValue = invoicePrice * invoiceQty;
             Log.d("CHECK", "Invoice Value: " + invoiceValue.toString());
@@ -137,8 +134,6 @@ public class StockCount extends AppCompatActivity {
             String LmdId = val.get(SessionManager.KEY_LMD_ID);
             String staff_ID = val.get(SessionManager.KEY_STAFF_ID);
 
-//            update LMDInvoiceValue table with holding cost entry
-//            updateInvoiceT(ItemId, LmdId);
 
             /**
              * Ensure that a duplicate stock count of the same product for the same lmd doesn't already exist for today.
@@ -147,7 +142,6 @@ public class StockCount extends AppCompatActivity {
 
                 String UniqueIDForInventoryT = allDetails.get(SessionManager.KEY_STAFF_ID) + "_" + String.valueOf(System.currentTimeMillis()) + "_FOD";
                 String UniqueIDForInvoice = allDetails.get(SessionManager.KEY_STAFF_ID) + "_"+ String.valueOf(System.currentTimeMillis()) + "_INVOICE";
-                String UniqueIDForRestock = allDetails.get(SessionManager.KEY_STAFF_ID) + "_"+ String.valueOf(System.currentTimeMillis()) + "_RESTOCK";
 
                 if (inventoryDBHandler.onAdd_Inventory03T(UniqueIDForInventoryT, currentDate, allDetails.get(SessionManager.KEY_LMD_ID),
                         allDetails.get(SessionManager.KEY_PRODUCT_ID), allDetails.get(SessionManager.KEY_PRODUCT_NAME), etCount.getText().toString(),
@@ -156,26 +150,6 @@ public class StockCount extends AppCompatActivity {
                     if (invoiceDBHandler.onAdd_LMDInvoiceValueT(UniqueIDForInvoice, allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID),
                             etCount.getText().toString(), currentDate, "FOD", myFormat.format(invoicePrice), myFormat.format(invoiceQty),
                             myFormat.format(invoiceValue), LastFODCount, LastFODDate, String.valueOf(DeliverySinceLastCount), staff_ID, "no")) {
-
-                        RestockModule.RestockBlock restock = new RestockModule.RestockBlock(StockCount.this);
-                        Double restockValue = restock.CalcRestockValue(invoiceQtyForRestock, ItemId, LmdId);
-
-                        Toast.makeText(StockCount.this, "Restock Value: " + myFormat.format(restockValue), Toast.LENGTH_LONG).show();
-
-                        //Not sure why this was put here. Hence am removing it. So that restock is calculated for every Stock Count. - Rehoboth (05/07/19)
-                        /*if (lastCount <= restockValue) {
-                            if (restockDBHandler.onAdd_RestockT(UniqueIDForRestock, allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), myFormat.format(restockValue), allDetails.get(SessionManager.KEY_LMD_ID) + allDetails.get(SessionManager.KEY_PRODUCT_ID),
-                                    etCount.getText().toString(), currentDate, allDetails.get(SessionManager.KEY_STAFF_ID), "no")) {
-                            } else {
-                                Toast.makeText(StockCount.this, "Error in saving Restock Value", Toast.LENGTH_LONG).show();
-                            }
-                        }*/
-
-                        //Hence now insert the restocks row into the db.
-                        if (!restockDBHandler.onAdd_RestockT(UniqueIDForRestock, allDetails.get(SessionManager.KEY_LMD_ID), allDetails.get(SessionManager.KEY_PRODUCT_ID), myFormat.format(restockValue), allDetails.get(SessionManager.KEY_LMD_ID) + allDetails.get(SessionManager.KEY_PRODUCT_ID),
-                                etCount.getText().toString(), currentDate, allDetails.get(SessionManager.KEY_STAFF_ID), "no")) {
-                            Toast.makeText(StockCount.this, "Error in saving Restock Value", Toast.LENGTH_LONG).show();
-                        }
 
                         new MaterialAlertDialogBuilder(StockCount.this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                                 .setTitle("Stock Count")
@@ -193,10 +167,7 @@ public class StockCount extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         session.CLEAR_COUNT_DETAILS();
-                                        //No longer clear LMD since we are moving on.
-                                        /*session.CLEAR_LMD_DETAILS();*/
-
-                                        startActivity(new Intent(StockCount.this, View_Receivable.class));
+                                        //no money to be collected. Hence go home home.
                                     }
                                 }).show();
                     } else {
@@ -242,7 +213,7 @@ public class StockCount extends AppCompatActivity {
         SQLiteDatabase database = inventoryDBHandler.getWritableDatabase();
         SQLiteDatabase database1 = invoiceDBHandler.getWritableDatabase();
 
-//        getting the holding cost
+        //getting the holding cost
         try {
             cursor = database.rawQuery("SELECT " + HoldingCostT.COLUMN_HOLDING_COST + " FROM " + HoldingCostT.TABLE_NAME +
                     " WHERE " + HoldingCostT.COLUMN_ITEM_ID + " =\"" + ItemId + "\"", null);

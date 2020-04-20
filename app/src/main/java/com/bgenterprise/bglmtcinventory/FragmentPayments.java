@@ -33,12 +33,12 @@ public class FragmentPayments extends Fragment {
         btnReceipts = view.findViewById(R.id.btnReceipts);
         btnTellers = view.findViewById(R.id.btnTellers);
 
-        btnReceipts.setOnClickListener(new View.OnClickListener() {
+        /*btnReceipts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), ReceiptsPage.class));
             }
-        });
+        });*/
 
         btnInvoices.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,7 +47,7 @@ public class FragmentPayments extends Fragment {
             }
         });
 
-        btnTellers.setOnClickListener(new View.OnClickListener() {
+        /*btnTellers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), TellerPage.class));
@@ -59,7 +59,7 @@ public class FragmentPayments extends Fragment {
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), View_Receivable.class));
             }
-        });
+        });*/
 
 
         return view;

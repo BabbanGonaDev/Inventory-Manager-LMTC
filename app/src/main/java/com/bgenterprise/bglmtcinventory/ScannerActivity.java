@@ -61,7 +61,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
         switch (Objects.requireNonNull(QRPrefs.getString("required", ""))) {
             case "LMD_Receipt":
-                try {
+                /*try {
                     if ((data[1].charAt(0) != 'R') || (data[1].charAt(16) != '9')) {
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
@@ -77,11 +77,11 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 } catch (StringIndexOutOfBoundsException e) {
                     Toast.makeText(getApplicationContext(), "Please scan an appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
-                }
+                }*/
                 break;
 
             case "Receipt":
-                try {
+                /*try {
                     Log.d("Receipt", data[0]);
                     session.CREATE_RECEIPT_SESSION(data[0]);
                     startActivity(new Intent(ScannerActivity.this, NewReceipt.class));
@@ -92,11 +92,11 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 } catch (StringIndexOutOfBoundsException e) {
                     Toast.makeText(getApplicationContext(), "Please scan an appropriate Receipt QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
-                }
+                }*/
                 break;
 
             case "TeamMember_Receipt":
-                try {
+                /*try {
                     if (data[1].charAt(0) != 'T') {
                         Toast.makeText(getApplicationContext(), "Please scan a BG Team Member's QR code to proceed", Toast.LENGTH_LONG).show();
                         finish();
@@ -112,7 +112,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 } catch (StringIndexOutOfBoundsException e) {
                     Toast.makeText(getApplicationContext(), "Please scan an appropriate Team Member QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
-                }
+                }*/
                 break;
 
             case "LMD_Count":
@@ -121,7 +121,8 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                     if ((data[1].charAt(0) != 'R') || (data[1].charAt(16) != '9')) {
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
-                    }else if(!invoicedb.isLMDinPriceGroup(data[1])){
+
+                        /*else if(!invoicedb.isLMDinPriceGroup(data[1])){
                         new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
                                 .setTitle("Unknown Price Group")
                                 .setMessage(data[0] + " (" + data[1] + ") was not found in any price group")
@@ -130,7 +131,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                                     public void onClick(DialogInterface dialog, int which) {
                                         startActivity(new Intent(ScannerActivity.this, Operations.class));
                                     }
-                                }).show();
+                                }).show();*/
                     }else{
                         Log.d("LMD_Count", data[0]+" "+data[1]+" "+data[2]);
                         session.CREATE_LMD_SESSION(data[0], data[1], data[2]);
@@ -170,7 +171,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
 
             case "Teller_Receipt":
-                try{
+                /*try{
                     Log.d("Receipt", data[0]);
 
                     TellerDBHandler tellerDBHandler = new TellerDBHandler(this);
@@ -201,11 +202,11 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 } catch (StringIndexOutOfBoundsException e) {
                     Toast.makeText(getApplicationContext(), "Please scan an appropriate Receipt QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
-                }
+                }*/
                 break;
 
             case "LMD_Receivable":
-                try {
+                /*try {
                     if ((data[1].charAt(0) != 'R') || (data[1].charAt(16) != '9')) {
                         Toast.makeText(getApplicationContext(), "Please scan an LMD's details to proceed", Toast.LENGTH_LONG).show();
                         finish();
@@ -221,7 +222,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 } catch (StringIndexOutOfBoundsException e) {
                     Toast.makeText(getApplicationContext(), "Please scan an appropriate LMD QR code to proceed", Toast.LENGTH_LONG).show();
                     finish();
-                }
+                }*/
                 break;
 
             default:
@@ -232,7 +233,4 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         QRPrefs.edit().putString("scanner_title", "").commit();
     }
 
-    public void CheckLMDPG(String lmdid, String lmdname){
-
-    }
 }

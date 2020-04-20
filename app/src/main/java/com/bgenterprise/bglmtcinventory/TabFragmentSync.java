@@ -72,7 +72,7 @@ public class TabFragmentSync extends Fragment {
                 final ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setMessage("Syncing down records, please wait");
                 progressDialog.show();
-                progressDialog.setCancelable(false);
+                progressDialog.setCancelable(true);
 
                 @SuppressLint("StaticFieldLeak") SyncModule.SyncDownInventory03T syncDownInventory03T = new SyncModule.SyncDownInventory03T(getActivity().getApplicationContext()) {
                     @Override

@@ -5,24 +5,10 @@
     <color name="colorAccent">#D81B60</color>
     <color name="text_color_white">#ecf0f1</color>
     <color name="text_color_blue">#050150</color>
-    <color name="text_color_grey">#7d7d7d</color>
-    <color name="text_color_black">#202020</color>
-    <color name="text_color_green">#008000</color>
-    <color name="text_color_red">#ff0000</color>
 
     <color name="button_white">#ffffff</color>
-    <color name="button_purple">#334b7d</color>
 
     <color name="text_blue">#334b7d</color>
-    <color name="text_white">#ffffff</color>
-    <color name="text_purple">#334b7d</color>
-    <color name="text_black">#202020</color>
-    <color name="text_grey">#636363</color>
-    <color name="text_green">#33b679</color>
 
 
-    <color name="layout_purple">#334b7d</color>
-    <color name="layout_silver">#d1d1d1</color>
-    <color name="layout_white">#ffffff</color>
-    <color name="layout_red">#ff0000</color>
 </resources>

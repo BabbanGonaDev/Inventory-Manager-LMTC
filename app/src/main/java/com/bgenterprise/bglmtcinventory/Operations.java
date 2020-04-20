@@ -92,32 +92,15 @@ public class Operations extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.operations, menu);
-        TextView tv_staffName, tv_staffID, tv_appVersion, tv_lastSync;
+        TextView tv_staffName, tv_staffID, tv_appVersion;
         tv_staffName = findViewById(R.id.tv_staffName);
         tv_staffID = findViewById(R.id.tv_staffID);
         tv_appVersion = findViewById(R.id.tv_appVersion);
-//        tv_lastSync = findViewById(R.id.tv_lastSync);
 
         tv_staffName.setText("Staff Name: "+ allDetails.get(SessionManager.KEY_STAFF_NAME));
         tv_staffID.setText("Staff ID: "+ allDetails.get(SessionManager.KEY_STAFF_ID));
         tv_appVersion.setText("App Version: " + allDetails.get(SessionManager.KEY_APP_VERSION));
-//        tv_lastSync.setText("Last Sync Date: 02-01-2019 05:15:30");
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -130,6 +113,8 @@ public class Operations extends AppCompatActivity
             fragment  = new FragmentStockManagement();
         } else if (id == R.id.itemSyncing) {
             fragment = new FragmentSyncing();
+        } else if (id == R.id.itemReports) {
+            fragment = new FragmentReports();
         } else if (id == R.id.itemHome) {
             fragment = new FragmentWelcome();
         }

@@ -41,12 +41,12 @@ public class InvoicesPage extends AppCompatActivity {
             }
         });
 
-        btnViewAllInvoices.setOnClickListener(new View.OnClickListener() {
+        /*btnViewAllInvoices.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(InvoicesPage.this, View_All_Invoices.class));
             }
-        });
+        });*/
 
     }
 }

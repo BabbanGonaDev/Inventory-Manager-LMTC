@@ -19,8 +19,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText etStaffName, etStaffID;
     Button btnLogin;
     SessionManager session;
-    String appVersion;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,8 +42,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                appVersion = "v5.0.4";
-                session.CREATE_LOGIN_SESSION(etStaffName.getText().toString(), etStaffID.getText().toString(), appVersion);
+                session.CREATE_LOGIN_SESSION(etStaffName.getText().toString(), etStaffID.getText().toString(), BuildConfig.VERSION_NAME);
 
                 Intent intent = new Intent(LoginActivity.this, Operations.class);
                 startActivity(intent);

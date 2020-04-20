@@ -13,7 +13,6 @@ public class View_Reports extends AppCompatActivity {
     TextView tvReceiptAmount, tvInvoiceAmount, tvReceivableAmount, tvLMDPriceGroup, tvLastPaymentDate, tvLastPaymentAmount, tvLMDReceiptCount, tvLastCountDate, tvLastInvoiceAmount, tvLMDdetails;
     InvoiceDBHandler invoiceDBHandler;
     InventoryDBHandler inventoryDBHandler;
-    ReceiptDBHandler receiptDBHandler;
 
 
     @Override
@@ -24,34 +23,34 @@ public class View_Reports extends AppCompatActivity {
         lmd_name = getIntent().getStringExtra("LMDNAME");
         invoiceDBHandler = new InvoiceDBHandler(View_Reports.this);
         inventoryDBHandler = new InventoryDBHandler(View_Reports.this);
-        receiptDBHandler = new ReceiptDBHandler(View_Reports.this);
 
         //Initialize the text views to be used.
         tvLMDdetails = findViewById(R.id.tvLMDdetails);
         tvInvoiceAmount = findViewById(R.id.tvInvoiceAmount);
-        tvReceiptAmount = findViewById(R.id.tvReceiptAmount);
+        tvLastInvoiceAmount = findViewById(R.id.tvLastInvoiceAmount);
+
+        /*tvReceiptAmount = findViewById(R.id.tvReceiptAmount);
         tvReceivableAmount = findViewById(R.id.tvReceivableAmount);
         tvLMDPriceGroup = findViewById(R.id.tvLMDPriceGroup);
         tvLastCountDate = findViewById(R.id.tvLastCountDate);
-        tvLastInvoiceAmount = findViewById(R.id.tvLastInvoiceAmount);
         tvLMDReceiptCount = findViewById(R.id.tvLMDReceiptCount);
         tvLastPaymentDate = findViewById(R.id.tvLastPaymentDate);
-        tvLastPaymentAmount = findViewById(R.id.tvLastPaymentAmount);
-
+        tvLastPaymentAmount = findViewById(R.id.tvLastPaymentAmount);*/
 
         //Toast.makeText(View_Reports.this, "We are in view reports", Toast.LENGTH_LONG).show();
         DecimalFormat myFormat = new DecimalFormat("#########.###");
 
         tvLMDdetails.setText(lmd_name + " ( " + lmd_id + " )");
         tvInvoiceAmount.setText("NGN " + myFormat.format(getAmountOfInvoice(lmd_id)));
-        tvLMDPriceGroup.setText(getLMDsPriceGroup(lmd_id));
+        tvLastInvoiceAmount.setText("NGN " + myFormat.format(getLastInvoiceAmount(lmd_id)));
+
+        /*tvLMDPriceGroup.setText(getLMDsPriceGroup(lmd_id));
         tvReceiptAmount.setText("NGN " + myFormat.format(getLMDReceiptsAmount(lmd_id)));
         tvReceivableAmount.setText("NGN " + myFormat.format(getLMDsReceivables(lmd_id)));
         tvLastCountDate.setText(getLastCountDate(lmd_id));
-        tvLastInvoiceAmount.setText("NGN " + myFormat.format(getLastInvoiceAmount(lmd_id)));
         tvLMDReceiptCount.setText(myFormat.format(getReceiptCount(lmd_id)));
         tvLastPaymentDate.setText(getLastPaymentDate(lmd_id));
-        tvLastPaymentAmount.setText("NGN " + myFormat.format(getLastPaymentAmount(lmd_id)));
+        tvLastPaymentAmount.setText("NGN " + myFormat.format(getLastPaymentAmount(lmd_id)));*/
 
 
     }
@@ -63,7 +62,12 @@ public class View_Reports extends AppCompatActivity {
         return invoiceDBHandler.getLMDsInvoices(LMDID);
     }
 
-    public String getLMDsPriceGroup(String LMDID){
+    public Integer getLastInvoiceAmount(String LMDID){
+        //This function returns the last invoice amount of the LMD.
+        return invoiceDBHandler.getLastInvoiceAmount(LMDID);
+    }
+
+    /*public String getLMDsPriceGroup(String LMDID){
         //This function returns the LMD's price group.
         return invoiceDBHandler.getPriceGroup(LMDID);
     }
@@ -82,14 +86,9 @@ public class View_Reports extends AppCompatActivity {
     public String getLastCountDate(String LMDID){
         //This function returns the last count done for an LMD.
         return invoiceDBHandler.getLastCountDate(LMDID);
-    }
+    }*/
 
-    public Integer getLastInvoiceAmount(String LMDID){
-        //This function returns the last invoice amount of the LMD.
-        return invoiceDBHandler.getLastInvoiceAmount(LMDID);
-    }
-
-    public Integer getReceiptCount(String LMDID){
+    /*public Integer getReceiptCount(String LMDID){
         //This function returns the number of receipts paid by an LMD.
         return receiptDBHandler.getReceiptCount(LMDID);
     }
@@ -102,7 +101,7 @@ public class View_Reports extends AppCompatActivity {
     public Double getLastPaymentAmount(String LMDID){
         //This function returns the last payment amount of the LMD.
         return receiptDBHandler.getLastPaymentAmount(LMDID);
-    }
+    }*/
 
 
 

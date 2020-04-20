@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
@@ -17,42 +18,20 @@ import com.leinardi.android.speeddial.SpeedDialView;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentWelcome extends Fragment {
-    /*FloatingActionButton fab_welcome;*/
-    SpeedDialView speedDialView;
+    private FloatingActionButton fab_welcome;
     View view;
 
     public FragmentWelcome() {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_welcome, container, false);
-        /*fab_welcome = view.findViewById(R.id.floating_action_button);*/
+        fab_welcome = view.findViewById(R.id.floating_action_button);
 
-        speedDialView = view.findViewById(R.id.speedDial);
-        speedDialView.inflate(R.menu.speeddial_menu);
-        speedDialView.setOnActionSelectedListener(new SpeedDialView.OnActionSelectedListener() {
-            @Override
-            public boolean onActionSelected(SpeedDialActionItem actionItem) {
-                switch (speedDialView.getId()) {
-                    case R.id.dialCount:
-
-                        return false;
-                    case R.id.dialReceipt:
-                        startActivity(new Intent(getActivity(), ReceiptsPage.class));
-                        return false;
-                    case R.id.dialTeller:
-                        startActivity(new Intent(getActivity(), NewTeller.class));
-                        return false;
-                    default:
-                        return false;
-                }
-            }
-        });
         return view;
     }
 

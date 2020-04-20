@@ -13,14 +13,15 @@
         android:icon="@drawable/ic_store"
         android:title="Stock Management" />
 
-    <!--<item
-        android:id="@+id/itemPayments"
-        android:icon="@drawable/ic_payment"
-        android:title="Payments" />
     <item
         android:id="@+id/itemReports"
         android:icon="@drawable/ic_assignment"
-        android:title="Reports" />-->
+        android:title="Reports" />
+
+    <!--<item
+        android:id="@+id/itemPayments"
+        android:icon="@drawable/ic_payment"
+        android:title="Payments" />-->
 
     <item
         android:id="@+id/itemSyncing"
